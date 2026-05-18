@@ -1,0 +1,398 @@
+const storyPath = "data/story.json";
+let storyData = null;
+let currentSceneId = null;
+let selectedCharacter = null;
+let history = [];
+
+const sceneHeader = document.getElementById("scene-header");
+const characterCard = document.getElementById("character-card");
+const sceneContent = document.getElementById("scene-content");
+const choiceList = document.getElementById("choice-list");
+const sourcePanel = document.getElementById("source-panel");
+const sourceContent = document.getElementById("source-content");
+const sourceText = document.getElementById("source-text");
+const sourceCommentary = document.getElementById("source-commentary");
+const backButton = document.getElementById("back-button");
+const resetButton = document.getElementById("reset-button");
+const progressWrap = document.getElementById("progress-wrap");
+const progressVisual = document.getElementById("progress-visual");
+
+backButton.addEventListener("click", goBack);
+resetButton.addEventListener("click", resetGame);
+
+function saveProgress() {
+  const data = { currentSceneId, selectedCharacter, history };
+  localStorage.setItem("haishanghua_progress", JSON.stringify(data));
+}
+
+function loadProgress() {
+  const raw = localStorage.getItem("haishanghua_progress");
+  if (!raw) return false;
+  try {
+    const data = JSON.parse(raw);
+    if (data.currentSceneId && storyData && getScene(data.currentSceneId)) {
+      currentSceneId = data.currentSceneId;
+      selectedCharacter = data.selectedCharacter;
+      history = data.history || [];
+      return true;
+    }
+  } catch (e) {
+    console.error("Failed to load progress", e);
+  }
+  return false;
+}
+
+function clearProgress() {
+  localStorage.removeItem("haishanghua_progress");
+}
+
+function goBack() {
+  if (history.length === 0) {
+    currentSceneId = storyData.startScene;
+    selectedCharacter = null;
+    renderScene();
+    return;
+  }
+  const last = history.pop();
+  currentSceneId = last.scene;
+  selectedCharacter = last.selectedCharacter;
+  renderScene();
+}
+
+function loadStoryViaXHR(path) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.overrideMimeType("application/json");
+    xhr.open("GET", path, true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200 || xhr.status === 0) {
+          try {
+            resolve(JSON.parse(xhr.responseText));
+          } catch (e) {
+            reject(new Error("JSON 解析失败：" + e.message));
+          }
+        } else {
+          reject(new Error("加载失败，状态码：" + xhr.status));
+        }
+      }
+    };
+    xhr.onerror = () => reject(new Error("网络请求错误"));
+    xhr.send();
+  });
+}
+
+function parseSource(source) {
+  const idx = source.indexOf("（解读：");
+  if (idx === -1) {
+    return { text: source, commentary: null };
+  }
+  const text = source.substring(0, idx).trim();
+  let depth = 1;
+  let endIdx = -1;
+  for (let i = idx + 4; i < source.length; i++) {
+    if (source[i] === "（") depth++;
+    if (source[i] === "）") {
+      depth--;
+      if (depth === 0) {
+        endIdx = i;
+        break;
+      }
+    }
+  }
+  if (endIdx === -1) endIdx = source.lastIndexOf("）");
+  const commentary = source.substring(idx + 4, endIdx).trim();
+  return { text, commentary };
+}
+
+async function loadStory() {
+  try {
+    let data;
+    try {
+      const response = await fetch(storyPath);
+      data = await response.json();
+    } catch (fetchErr) {
+      data = await loadStoryViaXHR(storyPath);
+    }
+    storyData = data;
+    const hasProgress = loadProgress();
+    if (!hasProgress) {
+      resetGame();
+    } else {
+      renderScene();
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const preview = urlParams.get("preview");
+    if (preview && storyData) {
+      const introScene = getScene(storyData.startScene);
+      const startChoice = introScene?.choices?.find((c) => c.character === preview);
+      if (startChoice) {
+        selectedCharacter = preview;
+        history = [{ scene: "intro", selectedCharacter: null, choice: startChoice.text }];
+        let sid = startChoice.nextScene;
+        let prev = "intro";
+        for (let i = 0; i < 5 && sid; i++) {
+          const sc = getScene(sid);
+          if (!sc) break;
+          history.push({ scene: prev, selectedCharacter: preview, choice: sc.choices?.[0]?.text || "" });
+          prev = sid;
+          const nc = sc.choices?.[0];
+          if (!nc) break;
+          sid = nc.nextScene;
+        }
+        currentSceneId = prev;
+        renderScene();
+      }
+    }
+  } catch (error) {
+    sceneHeader.innerHTML = "<h2>无法加载故事数据</h2>";
+    const isFileProtocol = window.location.protocol === "file:";
+    sceneContent.innerHTML = isFileProtocol
+      ? "检测到你是直接打开 HTML 文件（<code>file://</code> 协议）。<br><br>请通过本地 HTTP 服务器访问："
+        + "<ol><li>在项目目录运行 <code>python3 -m http.server 8080</code></li>"
+        + "<li>然后在浏览器打开 <a href='http://localhost:8080' target='_blank'>http://localhost:8080</a></li></ol>"
+      : (error.message || "请检查 data/story.json 文件是否存在且格式正确。");
+    choiceList.innerHTML = "";
+    sourcePanel.classList.add("hidden");
+  }
+}
+
+function resetGame() {
+  clearProgress();
+  currentSceneId = storyData?.startScene || "intro";
+  selectedCharacter = null;
+  history = [];
+  renderScene();
+}
+
+function getScene(sceneId) {
+  return storyData.scenes.find((scene) => scene.id === sceneId);
+}
+
+function isEndingScene(sceneId) {
+  return sceneId === "ending" || sceneId === "ending_zp" || sceneId === "ending_wl";
+}
+
+function getCharacterPath() {
+  if (!selectedCharacter) return [];
+  const introScene = getScene(storyData.startScene);
+  if (!introScene) return [];
+  const startChoice = introScene.choices.find((c) => c.character === selectedCharacter);
+  if (!startChoice) return [];
+
+  const path = [introScene];
+  let sceneId = startChoice.nextScene;
+  const maxSteps = 50;
+  let steps = 0;
+
+  while (sceneId && sceneId !== "intro" && steps < maxSteps) {
+    const scene = getScene(sceneId);
+    if (!scene) break;
+    path.push(scene);
+    const nextChoice = scene.choices?.[0];
+    if (!nextChoice) break;
+    sceneId = nextChoice.nextScene;
+    steps++;
+  }
+  return path;
+}
+
+function getSceneShortLabel(title) {
+  const parts = title.split("：");
+  return parts[parts.length - 1] || title;
+}
+
+function renderProgressVisual() {
+  if (!progressVisual || !progressWrap) return;
+
+  try {
+    const fullPath = getCharacterPath();
+
+    if (fullPath.length === 0) {
+      progressWrap.classList.add("hidden");
+      return;
+    }
+
+    const visitedSceneIds = new Set(history.map((h) => h.scene));
+    visitedSceneIds.add(currentSceneId);
+
+    // 只显示已走过 + 当前场景，未来不显示
+    const path = fullPath.filter((s) => visitedSceneIds.has(s.id));
+
+    if (path.length === 0) {
+      progressWrap.classList.add("hidden");
+      return;
+    }
+
+    const trunkY = 32;
+    const nodeSpacing = 110;
+    const startX = 50;
+
+    let svgPaths = [];
+    let labelsHtml = "";
+    let svgWidth = startX + path.length * nodeSpacing + 40;
+
+    path.forEach((scene, index) => {
+      const nodeX = startX + index * nodeSpacing;
+      const isCurrent = scene.id === currentSceneId;
+
+      // 主绳子段（水平贝塞尔曲线）
+      if (index > 0) {
+        const prevX = startX + (index - 1) * nodeSpacing;
+        const midX = (prevX + nodeX) / 2;
+        const wave = index % 2 === 0 ? 3 : -3;
+        svgPaths.push({
+          d: `M ${prevX + 5},${trunkY} Q ${midX},${trunkY + wave} ${nodeX - 5},${trunkY}`,
+          color: "var(--ink)",
+          width: 1.5,
+        });
+      }
+
+      // 场景标签（绳子上方）
+      const shortLabel = getSceneShortLabel(scene.title);
+      const labelClass = isCurrent ? "vine-current" : "vine-past";
+      labelsHtml += `<div class="vine-node-scene ${labelClass}" style="left:${nodeX}px;top:${trunkY - 26}px">${shortLabel}</div>`;
+
+      // 人物分支（绳子下方）
+      const people = scene.keyPeople || [];
+      people.forEach((person, pIndex) => {
+        const branchY = trunkY + 18 + pIndex * 16;
+        const endY = branchY + 8;
+
+        // 分支曲线
+        svgPaths.push({
+          d: `M ${nodeX},${trunkY + 4} Q ${nodeX + 4},${branchY - 2} ${nodeX},${endY}`,
+          color: "var(--border)",
+          width: 0.8,
+        });
+
+        labelsHtml += `<div class="vine-node-person" style="left:${nodeX}px;top:${endY + 2}px">${person}</div>`;
+      });
+    });
+
+    // 节点圆点
+    let dotsHtml = "";
+    path.forEach((scene, index) => {
+      const nodeX = startX + index * nodeSpacing;
+      const isCurrent = scene.id === currentSceneId;
+      const r = isCurrent ? 5.5 : 4;
+      const fill = isCurrent ? "#7a4f32" : "#2a2a2a";
+      if (isCurrent) {
+        dotsHtml += `<circle cx="${nodeX}" cy="${trunkY}" r="9" fill="rgba(122,79,50,0.08)"/>`;
+      }
+      dotsHtml += `<circle cx="${nodeX}" cy="${trunkY}" r="${r}" fill="${fill}"/>`;
+    });
+
+    const svgHeight = trunkY + 40 + Math.max(...path.map((s) => (s.keyPeople || []).length)) * 16;
+
+    const svgHtml = `<svg class="vine-svg-h" width="${svgWidth}" height="${svgHeight}">
+      ${svgPaths.map((p) => `<path d="${p.d}" stroke="${p.color}" fill="none" stroke-width="${p.width}" stroke-linecap="round"/>`).join("")}
+      ${dotsHtml}
+    </svg>`;
+
+    progressVisual.style.width = `${svgWidth}px`;
+    progressVisual.style.height = `${svgHeight}px`;
+    progressVisual.innerHTML = svgHtml + `<div class="vine-labels-h">${labelsHtml}</div>`;
+    progressWrap.classList.remove("hidden");
+  } catch (err) {
+    console.error("Progress visual error:", err);
+    progressWrap.classList.add("hidden");
+  }
+}
+
+function renderScene() {
+  const scene = getScene(currentSceneId);
+  if (!scene) {
+    sceneHeader.innerHTML = `<h2>场景未找到</h2>`;
+    sceneContent.innerText = "请检查故事配置。";
+    choiceList.innerHTML = "";
+    sourcePanel.classList.add("hidden");
+    return;
+  }
+
+  const ending = isEndingScene(currentSceneId);
+
+  sceneHeader.innerHTML = `<h2>${scene.title}</h2>`;
+
+  if (ending) {
+    sceneContent.classList.add("ending-content");
+    sceneHeader.classList.add("ending-header");
+    characterCard.classList.add("hidden");
+    sourcePanel.classList.add("hidden");
+  } else {
+    sceneContent.classList.remove("ending-content");
+    sceneHeader.classList.remove("ending-header");
+    if (selectedCharacter) {
+      showCharacterInfo(selectedCharacter);
+    } else {
+      characterCard.classList.add("hidden");
+    }
+    if (scene.source) {
+      sourcePanel.classList.remove("hidden");
+      const parsed = parseSource(scene.source);
+      sourceText.innerText = parsed.text;
+      if (parsed.commentary) {
+        sourceCommentary.classList.remove("hidden");
+        sourceCommentary.innerText = parsed.commentary;
+      } else {
+        sourceCommentary.classList.add("hidden");
+        sourceCommentary.innerText = "";
+      }
+    } else {
+      sourcePanel.classList.add("hidden");
+      sourceCommentary.classList.add("hidden");
+    }
+  }
+
+  sceneContent.innerText = scene.content;
+  renderChoices(scene.choices);
+  renderProgressVisual();
+  saveProgress();
+}
+
+function showCharacterInfo(characterId) {
+  const character = storyData.characters.find((item) => item.id === characterId);
+  if (!character) {
+    characterCard.classList.add("hidden");
+    return;
+  }
+
+  characterCard.classList.remove("hidden");
+  characterCard.innerHTML = `
+    <strong>当前角色</strong>
+    <h3>${character.name}</h3>
+    <p>${character.description}</p>
+  `;
+}
+
+function renderChoices(choices) {
+  choiceList.innerHTML = "";
+  choices.forEach((choice) => {
+    const button = document.createElement("button");
+    button.className = "choice-button";
+    button.innerText = choice.text;
+    button.addEventListener("click", () => selectChoice(choice));
+    choiceList.appendChild(button);
+  });
+}
+
+function selectChoice(choice) {
+  if (choice.nextScene === "__BACK__") {
+    goBack();
+    return;
+  }
+
+  history.push({
+    scene: currentSceneId,
+    selectedCharacter,
+    choice: choice.text,
+  });
+  if (choice.character) {
+    selectedCharacter = choice.character;
+  }
+  currentSceneId = choice.nextScene;
+  renderScene();
+}
+
+loadStory();

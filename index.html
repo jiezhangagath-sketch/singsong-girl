@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>《海上花》互动体验</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <p class="eyebrow">上海租界 · 章节演绎</p>
+      <h1>《海上花》互动体验</h1>
+    </header>
+
+    <!-- 顶部横向进度 -->
+    <div id="progress-wrap" class="progress-wrap hidden">
+      <div id="progress-visual" class="progress-visual"></div>
+    </div>
+
+    <!-- 主体内容区：叙事 + 原文并排 -->
+    <div class="content-grid">
+      <div class="narrative">
+        <div id="character-card" class="character-card hidden"></div>
+        <div id="scene-header" class="scene-header"></div>
+        <div id="scene-content" class="scene-content"></div>
+        <div id="choice-list" class="choice-list"></div>
+
+        <div class="action-row">
+          <button id="back-button" class="button button-secondary">返回上一步</button>
+          <button id="reset-button" class="button button-secondary">回到序章</button>
+        </div>
+      </div>
+
+      <!-- 原文摘录 -->
+      <div id="source-panel" class="source-panel hidden">
+        <div class="source-label">原文摘录</div>
+        <div id="source-content" class="source-content">
+          <div id="source-text" class="source-text"></div>
+          <div id="source-commentary" class="source-commentary hidden"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
