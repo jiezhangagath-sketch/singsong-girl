@@ -410,6 +410,14 @@ function renderChoices(choices) {
         `images/portrait-${charId}.jpg`,
         `images/portrait-${charId}.jpeg`,
         `images/portrait-${charId}.webp`,
+        `${char.name}.png`,
+        `${char.name}.jpg`,
+        `${char.name}.jpeg`,
+        `${char.name}.webp`,
+        `portrait-${charId}.png`,
+        `portrait-${charId}.jpg`,
+        `portrait-${charId}.jpeg`,
+        `portrait-${charId}.webp`,
       ], 0);
       avatarWrap.appendChild(img);
 
