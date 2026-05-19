@@ -388,21 +388,29 @@ function renderChoices(choices) {
       const avatarWrap = document.createElement("div");
       avatarWrap.className = "character-avatar-wrap";
 
-      // 尝试加载头像图片
+      // 尝试加载头像图片（优先匹配角色中文名，如 images/赵朴斋.png）
       const img = document.createElement("img");
       img.alt = char.name;
       img.loading = "lazy";
-      // 依次尝试 png / jpg / jpeg / webp
-      const tryNextFormat = (formats, idx) => {
-        if (idx >= formats.length) {
+      const tryNextSrc = (candidates, idx) => {
+        if (idx >= candidates.length) {
           img.style.display = "none";
           avatarWrap.innerHTML = `<span class="avatar-fallback">${char.name[0]}</span>`;
           return;
         }
-        img.src = `images/portrait-${charId}.${formats[idx]}`;
-        img.onerror = () => tryNextFormat(formats, idx + 1);
+        img.src = candidates[idx];
+        img.onerror = () => tryNextSrc(candidates, idx + 1);
       };
-      tryNextFormat(["png", "jpg", "jpeg", "webp"], 0);
+      tryNextSrc([
+        `images/${char.name}.png`,
+        `images/${char.name}.jpg`,
+        `images/${char.name}.jpeg`,
+        `images/${char.name}.webp`,
+        `images/portrait-${charId}.png`,
+        `images/portrait-${charId}.jpg`,
+        `images/portrait-${charId}.jpeg`,
+        `images/portrait-${charId}.webp`,
+      ], 0);
       avatarWrap.appendChild(img);
 
       // 角色名
