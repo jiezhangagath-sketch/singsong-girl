@@ -368,6 +368,74 @@ function showCharacterInfo(characterId) {
 
 function renderChoices(choices) {
   choiceList.innerHTML = "";
+
+  // 序幕场景：渲染角色头像选择网格
+  const isIntro = currentSceneId === storyData?.startScene;
+  if (isIntro) {
+    choiceList.classList.add("character-select-grid");
+    choices.forEach((choice, index) => {
+      const charId = choice.character;
+      const char = storyData.characters.find((c) => c.id === charId);
+      if (!char) return;
+
+      const card = document.createElement("div");
+      card.className = "character-select-card";
+      card.setAttribute("role", "button");
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("aria-label", `选择角色：${char.name}`);
+
+      // 头像容器
+      const avatarWrap = document.createElement("div");
+      avatarWrap.className = "character-avatar-wrap";
+
+      // 尝试加载头像图片
+      const img = document.createElement("img");
+      img.alt = char.name;
+      img.loading = "lazy";
+      // 依次尝试 png / jpg / jpeg / webp
+      const tryNextFormat = (formats, idx) => {
+        if (idx >= formats.length) {
+          img.style.display = "none";
+          avatarWrap.innerHTML = `<span class="avatar-fallback">${char.name[0]}</span>`;
+          return;
+        }
+        img.src = `images/portrait-${charId}.${formats[idx]}`;
+        img.onerror = () => tryNextFormat(formats, idx + 1);
+      };
+      tryNextFormat(["png", "jpg", "jpeg", "webp"], 0);
+      avatarWrap.appendChild(img);
+
+      // 角色名
+      const nameEl = document.createElement("h4");
+      nameEl.className = "character-select-name";
+      nameEl.innerText = char.name;
+
+      // 简介
+      const descEl = document.createElement("p");
+      descEl.className = "character-select-desc";
+      descEl.innerText = char.description;
+
+      card.appendChild(avatarWrap);
+      card.appendChild(nameEl);
+      card.appendChild(descEl);
+
+      // 点击/键盘选择
+      const activate = () => selectChoice(choice);
+      card.addEventListener("click", activate);
+      card.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          activate();
+        }
+      });
+
+      choiceList.appendChild(card);
+    });
+    return;
+  }
+
+  // 普通场景：渲染选择按钮
+  choiceList.classList.remove("character-select-grid");
   choices.forEach((choice) => {
     const button = document.createElement("button");
     button.className = "choice-button";
