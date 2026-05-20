@@ -84,6 +84,87 @@ body {
   letter-spacing: 0.1em;
 }
 
+/* ── 序幕阶段：聚光灯暗化 ── */
+.app-shell.intro-phase .app-header {
+  opacity: 0.18;
+  filter: grayscale(0.5);
+  transition: opacity 1.4s ease, filter 1.4s ease;
+}
+
+.app-shell.intro-phase .scene-header {
+  opacity: 0.2;
+  transition: opacity 1.4s ease;
+}
+
+.app-shell.intro-phase .source-panel {
+  opacity: 0.08;
+  transition: opacity 1.4s ease;
+}
+
+.app-shell.intro-phase .action-row {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+/* 退出序幕时平滑恢复 */
+.app-shell {
+  transition: filter 0.8s ease;
+}
+
+/* ── 开场文字淡入（墨晕开）── */
+.scene-content.intro-ink {
+  opacity: 0;
+  filter: blur(2px);
+  transform: translateY(10px);
+  animation: inkReveal 1.8s ease 0.3s forwards;
+}
+
+@keyframes inkReveal {
+  0% {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translateY(12px);
+  }
+  60% {
+    opacity: 0.85;
+    filter: blur(0.5px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+/* ── 角色选择网格升起 ── */
+.choice-list.character-select-grid.intro-rise {
+  opacity: 0;
+  transform: translateY(28px) scale(0.97);
+  animation: introRise 1s ease 2.2s forwards;
+}
+
+@keyframes introRise {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 聚光灯：角色区域微光 */
+.app-shell.intro-phase .choice-list.character-select-grid {
+  position: relative;
+}
+
+.app-shell.intro-phase .choice-list.character-select-grid::after {
+  content: "";
+  position: absolute;
+  inset: -24px;
+  background: radial-gradient(ellipse at center, rgba(244, 241, 234, 0.14) 0%, transparent 62%);
+  pointer-events: none;
+  z-index: -1;
+}
+
 /* ── 横向进度 ── */
 .progress-wrap {
   width: 100%;

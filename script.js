@@ -312,10 +312,15 @@ function renderScene() {
   }
 
   const ending = isEndingScene(currentSceneId);
+  const isIntro = currentSceneId === storyData?.startScene;
+  const appShell = document.querySelector(".app-shell");
 
   sceneHeader.innerHTML = `<h2>${scene.title}</h2>`;
 
   if (ending) {
+    appShell?.classList.remove("intro-phase");
+    sceneContent.classList.remove("intro-ink");
+    choiceList.classList.remove("intro-rise");
     sceneContent.classList.add("ending-content");
     sceneHeader.classList.add("ending-header");
     characterCard.classList.add("hidden");
@@ -328,7 +333,7 @@ function renderScene() {
     } else {
       characterCard.classList.add("hidden");
     }
-    if (scene.source) {
+    if (scene.source && !isIntro) {
       sourcePanel.classList.remove("hidden");
       const parsed = parseSource(scene.source);
       sourceText.innerText = parsed.text;
@@ -345,8 +350,36 @@ function renderScene() {
     }
   }
 
+  // 序幕阶段处理
+  if (isIntro) {
+    appShell?.classList.add("intro-phase");
+    characterCard.classList.add("hidden");
+    progressWrap.classList.add("hidden");
+
+    // 强制重流动画（确保每次进入序章都重新播放）
+    sceneContent.classList.remove("intro-ink");
+    sceneContent.style.animation = "none";
+    void sceneContent.offsetHeight; // reflow
+    sceneContent.style.animation = "";
+    sceneContent.classList.add("intro-ink");
+
+    choiceList.classList.remove("intro-rise");
+    choiceList.style.animation = "none";
+    void choiceList.offsetHeight;
+    choiceList.style.animation = "";
+  } else {
+    appShell?.classList.remove("intro-phase");
+    sceneContent.classList.remove("intro-ink");
+    choiceList.classList.remove("intro-rise");
+  }
+
   sceneContent.innerText = scene.content;
   renderChoices(scene.choices);
+
+  if (isIntro) {
+    choiceList.classList.add("intro-rise");
+  }
+
   renderProgressVisual();
   saveProgress();
 }
@@ -461,12 +494,7 @@ function renderChoices(choices) {
   });
 }
 
-function selectChoice(choice) {
-  if (choice.nextScene === "__BACK__") {
-    goBack();
-    return;
-  }
-
+function doSelect(choice) {
   history.push({
     scene: currentSceneId,
     selectedCharacter,
@@ -477,6 +505,37 @@ function selectChoice(choice) {
   }
   currentSceneId = choice.nextScene;
   renderScene();
+}
+
+function selectChoice(choice) {
+  if (choice.nextScene === "__BACK__") {
+    goBack();
+    return;
+  }
+
+  const isIntro = currentSceneId === storyData?.startScene;
+  if (isIntro) {
+    // 退出序幕：先移除暗化，等过渡完成再跳转
+    const appShell = document.querySelector(".app-shell");
+    appShell?.classList.remove("intro-phase");
+    // 给选中的卡片加一个瞬时高亮反馈
+    const cards = choiceList.querySelectorAll(".character-select-card");
+    cards.forEach((card) => {
+      if (card.contains(document.activeElement) || card === document.activeElement) {
+        card.style.transform = "scale(1.06)";
+        card.style.borderColor = "var(--accent)";
+      } else {
+        card.style.opacity = "0.3";
+        card.style.filter = "grayscale(0.6)";
+      }
+    });
+    setTimeout(() => {
+      doSelect(choice);
+    }, 650);
+    return;
+  }
+
+  doSelect(choice);
 }
 
 loadStory();
