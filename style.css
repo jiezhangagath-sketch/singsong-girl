@@ -358,7 +358,7 @@ body {
 /* ── 角色选择网格（序幕专用）── */
 .choice-list.character-select-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   padding: 4px 0 8px;
 }
@@ -417,6 +417,116 @@ body {
 .character-select-card:nth-child(2) .character-avatar-wrap { animation-delay: 0.6s; }
 .character-select-card:nth-child(3) .character-avatar-wrap { animation-delay: 1.2s; }
 .character-select-card:nth-child(4) .character-avatar-wrap { animation-delay: 1.8s; }
+.character-select-card:nth-child(5) .character-avatar-wrap { animation-delay: 2.4s; }
+.character-select-card:nth-child(6) .character-avatar-wrap { animation-delay: 3.0s; }
+
+/* ── 隐藏角色剪影（清末仆役风格）── */
+.hidden-character {
+  border-style: dashed;
+  border-color: var(--border);
+  background: linear-gradient(145deg, var(--paper-light) 0%, var(--paper-dark) 100%);
+}
+
+.hidden-character:hover {
+  border-color: var(--accent);
+  box-shadow: 0 10px 28px rgba(122, 79, 50, 0.14);
+}
+
+.hidden-character.revealed {
+  border-style: solid;
+  border-color: var(--accent);
+  background: var(--paper-light);
+  animation: revealPulse 0.5s ease;
+}
+
+@keyframes revealPulse {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 男仆剪影：瓜皮小帽 + 长衫 */
+.silhouette {
+  width: 64px;
+  height: 88px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.silhouette::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  background: #4a3f35;
+  border-radius: 50%;
+  top: 4px;
+}
+
+.silhouette::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4a3f35;
+  top: 28px;
+}
+
+.silhouette-male::after {
+  width: 48px;
+  height: 54px;
+  border-radius: 16px 16px 4px 4px;
+}
+
+/* 男仆瓜皮帽 */
+.silhouette-male .hat {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  width: 22px;
+  height: 10px;
+  background: #3a3228;
+  border-radius: 50% 50% 0 0;
+}
+
+/* 女仆剪影：发髻 + 短袄 */
+.silhouette-female::after {
+  width: 44px;
+  height: 56px;
+  border-radius: 18px 18px 6px 6px;
+}
+
+/* 女仆发髻 */
+.silhouette-female .bun {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -2px;
+  width: 16px;
+  height: 14px;
+  background: #3a3228;
+  border-radius: 50% 50% 40% 40%;
+}
+
+.hidden-character .character-select-name {
+  color: var(--text-muted);
+  font-style: italic;
+  letter-spacing: 2px;
+}
+
+.hidden-character.revealed .character-select-name {
+  color: var(--text);
+  font-style: normal;
+  letter-spacing: 0;
+}
+
+/* 隐藏角色直接显示原图，不加 sepia 滤镜 */
+.hidden-character .character-avatar-wrap img {
+  filter: none;
+}
 
 .character-avatar-wrap img {
   width: 100%;
@@ -610,6 +720,7 @@ body {
   }
 
   .choice-list.character-select-grid {
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 

@@ -109,10 +109,10 @@ async function loadStory() {
   try {
     let data;
     try {
-      const response = await fetch(storyPath);
+      const response = await fetch(storyPath + "?t=" + Date.now());
       data = await response.json();
     } catch (fetchErr) {
-      data = await loadStoryViaXHR(storyPath);
+      data = await loadStoryViaXHR(storyPath + "?t=" + Date.now());
     }
     storyData = data;
     const hasProgress = loadProgress();
@@ -413,70 +413,114 @@ function renderChoices(choices) {
 
       const card = document.createElement("div");
       card.className = "character-select-card";
+      if (char.hidden) {
+        card.classList.add("hidden-character");
+      }
       card.setAttribute("role", "button");
       card.setAttribute("tabindex", "0");
-      card.setAttribute("aria-label", `选择角色：${char.name}`);
 
       // 头像容器
       const avatarWrap = document.createElement("div");
       avatarWrap.className = "character-avatar-wrap";
 
-      // 尝试加载头像图片（优先匹配角色中文名，如 images/赵朴斋.png）
-      const img = document.createElement("img");
-      img.alt = char.name;
-      img.loading = "lazy";
-      const tryNextSrc = (candidates, idx) => {
-        if (idx >= candidates.length) {
-          img.style.display = "none";
-          avatarWrap.innerHTML = `<span class="avatar-fallback">${char.name[0]}</span>`;
-          return;
-        }
-        img.src = candidates[idx];
-        img.onerror = () => tryNextSrc(candidates, idx + 1);
-      };
-      tryNextSrc([
-        `images/${char.name}.png`,
-        `images/${char.name}.jpg`,
-        `images/${char.name}.jpeg`,
-        `images/${char.name}.webp`,
-        `images/portrait-${charId}.png`,
-        `images/portrait-${charId}.jpg`,
-        `images/portrait-${charId}.jpeg`,
-        `images/portrait-${charId}.webp`,
-        `${char.name}.png`,
-        `${char.name}.jpg`,
-        `${char.name}.jpeg`,
-        `${char.name}.webp`,
-        `portrait-${charId}.png`,
-        `portrait-${charId}.jpg`,
-        `portrait-${charId}.jpeg`,
-        `portrait-${charId}.webp`,
-      ], 0);
-      avatarWrap.appendChild(img);
+      if (char.hidden) {
+        // 隐藏角色：先尝试加载图片，失败则回退到 CSS 剪影
+        card.setAttribute("aria-label", "未知人物");
+        const img = document.createElement("img");
+        img.alt = "未知人物";
+        img.loading = "lazy";
+        img.className = "hidden-avatar-img";
+        img.style.transition = "transform 0.35s ease";
+        let imgLoaded = false;
+        img.onload = () => { imgLoaded = true; };
+        img.onerror = () => {
+          if (!imgLoaded) {
+            img.style.display = "none";
+            avatarWrap.innerHTML = `<span class="avatar-fallback">${char.name[0]}</span>`;
+          }
+        };
+        img.src = `images/${char.name}.png?t=${Date.now()}`;
+        avatarWrap.appendChild(img);
+      } else {
+        card.setAttribute("aria-label", `选择角色：${char.name}`);
+        // 尝试加载头像图片（优先匹配角色中文名，如 images/赵朴斋.png）
+        const img = document.createElement("img");
+        img.alt = char.name;
+        img.loading = "lazy";
+        const tryNextSrc = (candidates, idx) => {
+          if (idx >= candidates.length) {
+            img.style.display = "none";
+            avatarWrap.innerHTML = `<span class="avatar-fallback">${char.name[0]}</span>`;
+            return;
+          }
+          img.src = candidates[idx];
+          img.onerror = () => tryNextSrc(candidates, idx + 1);
+        };
+        tryNextSrc([
+          `images/${char.name}.png?t=${Date.now()}`,
+          `images/${char.name}.jpg?t=${Date.now()}`,
+          `images/${char.name}.jpeg?t=${Date.now()}`,
+          `images/${char.name}.webp?t=${Date.now()}`,
+          `images/portrait-${charId}.png`,
+          `images/portrait-${charId}.jpg`,
+          `images/portrait-${charId}.jpeg`,
+          `images/portrait-${charId}.webp`,
+          `${char.name}.png`,
+          `${char.name}.jpg`,
+          `${char.name}.jpeg`,
+          `${char.name}.webp`,
+          `portrait-${charId}.png`,
+          `portrait-${charId}.jpg`,
+          `portrait-${charId}.jpeg`,
+          `portrait-${charId}.webp`,
+        ], 0);
+        avatarWrap.appendChild(img);
+      }
 
       // 角色名
       const nameEl = document.createElement("h4");
       nameEl.className = "character-select-name";
-      nameEl.innerText = char.name;
+      nameEl.innerText = char.hidden ? "隐藏人物" : char.name;
 
       // 简介
       const descEl = document.createElement("p");
       descEl.className = "character-select-desc";
-      descEl.innerText = char.description;
+      descEl.innerText = char.hidden ? "点击揭示身份" : char.description;
 
       card.appendChild(avatarWrap);
       card.appendChild(nameEl);
       card.appendChild(descEl);
 
       // 点击/键盘选择
-      const activate = () => selectChoice(choice);
-      card.addEventListener("click", activate);
-      card.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          activate();
-        }
-      });
+      if (char.hidden) {
+        // 隐藏角色：第一次点击揭示，第二次点击选择
+        const handleReveal = () => {
+          if (card.classList.contains("revealed")) {
+            selectChoice(choice);
+          } else {
+            card.classList.add("revealed");
+            nameEl.innerText = char.name;
+            descEl.innerText = char.description;
+            card.setAttribute("aria-label", `选择角色：${char.name}`);
+          }
+        };
+        card.addEventListener("click", handleReveal);
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleReveal();
+          }
+        });
+      } else {
+        const activate = () => selectChoice(choice);
+        card.addEventListener("click", activate);
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            activate();
+          }
+        });
+      }
 
       choiceList.appendChild(card);
     });
