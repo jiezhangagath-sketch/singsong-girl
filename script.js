@@ -190,46 +190,94 @@ function renderRelationshipNetwork(charId, choice) {
   title.innerText = network.center.name + "的人物关系";
   container.appendChild(title);
 
-  const size = 420;
+  const size = 460;
   const centerX = size / 2;
   const centerY = size / 2;
-  const radius = 140;
+  const radius = 155;
 
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 " + size + " " + size);
   svg.setAttribute("class", "network-svg");
 
+  const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+  const filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
+  filter.setAttribute("id", "nodeShadow");
+  filter.setAttribute("x", "-30%");
+  filter.setAttribute("y", "-30%");
+  filter.setAttribute("width", "160%");
+  filter.setAttribute("height", "160%");
+  filter.innerHTML = `
+    <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#7a4f32" flood-opacity="0.15"/>
+  `;
+  defs.appendChild(filter);
+  svg.appendChild(defs);
+
   const nodeCount = network.nodes.length;
+  const nodePositions = [];
+
+  // 计算节点位置
   network.nodes.forEach((node, i) => {
     const angle = (2 * Math.PI * i) / nodeCount - Math.PI / 2;
     const x = centerX + radius * Math.cos(angle);
     const y = centerY + radius * Math.sin(angle);
+    nodePositions.push({ x, y, angle, node });
+  });
 
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", centerX);
-    line.setAttribute("y1", centerY);
-    line.setAttribute("x2", x);
-    line.setAttribute("y2", y);
-    line.setAttribute("class", "network-line");
-    svg.appendChild(line);
+  // 绘制柔和曲线连线 + 关系标签
+  nodePositions.forEach((pos, i) => {
+    const { x, y, angle, node } = pos;
 
-    const midX = (centerX + x) / 2;
-    const midY = (centerY + y) / 2;
-    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    text.setAttribute("x", midX);
-    text.setAttribute("y", midY);
-    text.setAttribute("class", "network-relation-text");
-    text.setAttribute("text-anchor", "middle");
-    text.setAttribute("dominant-baseline", "middle");
-    text.textContent = node.relation;
-    svg.appendChild(text);
+    // 二次贝塞尔曲线控制点：向外偏移，形成柔和弧线
+    const controlDist = radius * 0.35;
+    const controlX = centerX + controlDist * Math.cos(angle);
+    const controlY = centerY + controlDist * Math.sin(angle);
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", `M ${centerX},${centerY} Q ${controlX},${controlY} ${x},${y}`);
+    path.setAttribute("class", "network-curve");
+    path.style.animationDelay = (i * 0.1) + "s";
+    svg.appendChild(path);
+
+    // 关系标签背景（沿曲线中点偏外）
+    const t = 0.55;
+    const qx = (1 - t) * (1 - t) * centerX + 2 * (1 - t) * t * controlX + t * t * x;
+    const qy = (1 - t) * (1 - t) * centerY + 2 * (1 - t) * t * controlY + t * t * y;
+
+    const bgRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    const textWidth = node.relation.length * 13 + 10;
+    bgRect.setAttribute("x", qx - textWidth / 2);
+    bgRect.setAttribute("y", qy - 10);
+    bgRect.setAttribute("width", textWidth);
+    bgRect.setAttribute("height", 20);
+    bgRect.setAttribute("rx", 10);
+    bgRect.setAttribute("class", "network-tag-bg");
+    svg.appendChild(bgRect);
+
+    const relText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    relText.setAttribute("x", qx);
+    relText.setAttribute("y", qy + 3);
+    relText.setAttribute("class", "network-relation-text");
+    relText.setAttribute("text-anchor", "middle");
+    relText.setAttribute("dominant-baseline", "middle");
+    relText.textContent = node.relation;
+    svg.appendChild(relText);
+  });
+
+  // 外围节点（带入场动画）
+  nodePositions.forEach((pos, i) => {
+    const { x, y, node } = pos;
+
+    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g.setAttribute("class", "network-node-group");
+    g.style.animationDelay = (0.3 + i * 0.12) + "s";
 
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     circle.setAttribute("cx", x);
     circle.setAttribute("cy", y);
-    circle.setAttribute("r", 34);
+    circle.setAttribute("r", 36);
     circle.setAttribute("class", "network-node-outer");
-    svg.appendChild(circle);
+    circle.setAttribute("filter", "url(#nodeShadow)");
+    g.appendChild(circle);
 
     const nameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
     nameText.setAttribute("x", x);
@@ -238,33 +286,42 @@ function renderRelationshipNetwork(charId, choice) {
     nameText.setAttribute("text-anchor", "middle");
     nameText.setAttribute("dominant-baseline", "middle");
     nameText.textContent = node.name;
-    svg.appendChild(nameText);
+    g.appendChild(nameText);
 
     const labelText = document.createElementNS("http://www.w3.org/2000/svg", "text");
     labelText.setAttribute("x", x);
-    labelText.setAttribute("y", y + 50);
+    labelText.setAttribute("y", y + 54);
     labelText.setAttribute("class", "network-label-text");
     labelText.setAttribute("text-anchor", "middle");
     labelText.textContent = node.label;
-    svg.appendChild(labelText);
+    g.appendChild(labelText);
+
+    svg.appendChild(g);
   });
+
+  // 中心节点
+  const centerG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  centerG.setAttribute("class", "network-node-group");
+  centerG.style.animationDelay = "0s";
 
   const centerCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   centerCircle.setAttribute("cx", centerX);
   centerCircle.setAttribute("cy", centerY);
-  centerCircle.setAttribute("r", 46);
+  centerCircle.setAttribute("r", 48);
   centerCircle.setAttribute("class", "network-node-center");
-  svg.appendChild(centerCircle);
+  centerCircle.setAttribute("filter", "url(#nodeShadow)");
+  centerG.appendChild(centerCircle);
 
   const centerText = document.createElementNS("http://www.w3.org/2000/svg", "text");
   centerText.setAttribute("x", centerX);
-  centerText.setAttribute("y", centerY + 2);
+  centerText.setAttribute("y", centerY + 3);
   centerText.setAttribute("class", "network-center-text");
   centerText.setAttribute("text-anchor", "middle");
   centerText.setAttribute("dominant-baseline", "middle");
   centerText.textContent = network.center.name;
-  svg.appendChild(centerText);
+  centerG.appendChild(centerText);
 
+  svg.appendChild(centerG);
   container.appendChild(svg);
 
   const btnRow = document.createElement("div");

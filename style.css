@@ -777,50 +777,6 @@ body {
   display: block;
 }
 
-.network-line {
-  stroke: var(--border);
-  stroke-width: 1;
-}
-
-.network-relation-text {
-  font-size: 11px;
-  fill: var(--accent);
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
-
-.network-node-center {
-  fill: var(--accent);
-  stroke: var(--paper-dark);
-  stroke-width: 2;
-}
-
-.network-center-text {
-  font-size: 14px;
-  fill: #fff;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
-
-.network-node-outer {
-  fill: var(--paper-dark);
-  stroke: var(--border);
-  stroke-width: 1.5;
-}
-
-.network-node-text {
-  font-size: 12px;
-  fill: var(--ink);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-}
-
-.network-label-text {
-  font-size: 10px;
-  fill: var(--text-muted);
-  letter-spacing: 0.02em;
-}
-
 .network-btn-row {
   display: flex;
   gap: 14px;
@@ -830,4 +786,101 @@ body {
 
 .network-btn-row .button {
   flex: 1;
+}
+
+/* 灵动曲线连线 */
+.network-curve {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: drawCurve 1s ease forwards;
+}
+
+@keyframes drawCurve {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* 关系标签背景 */
+.network-tag-bg {
+  fill: var(--paper-dark);
+  stroke: var(--border-light);
+  stroke-width: 0.5;
+}
+
+/* 节点入场动画 */
+.network-node-group {
+  opacity: 0;
+  transform-origin: center;
+  animation: popNode 0.5s ease forwards;
+}
+
+@keyframes popNode {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 外围节点增强 */
+.network-node-outer {
+  fill: var(--paper-light);
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  transition: all 0.3s ease;
+}
+
+.network-node-outer:hover {
+  fill: var(--paper-dark);
+  stroke-width: 2.5;
+}
+
+/* 中心节点增强 */
+.network-node-center {
+  fill: var(--accent);
+  stroke: var(--paper-light);
+  stroke-width: 3;
+}
+
+/* 关系文字 */
+.network-relation-text {
+  font-size: 11px;
+  fill: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+/* 外围节点文字 */
+.network-node-text {
+  font-size: 12px;
+  fill: var(--ink);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+/* 标签文字 */
+.network-label-text {
+  font-size: 10px;
+  fill: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* 中心文字 */
+.network-center-text {
+  font-size: 15px;
+  fill: #fff;
+  font-weight: 700;
+  letter-spacing: 0.06em;
 }

@@ -3,12 +3,12 @@
     "zhaopuzhai": {
       "center": { "id": "zhaopuzhai", "name": "赵朴斋" },
       "nodes": [
-        { "id": "hongshanqing", "name": "洪善卿", "relation": "生意往来", "label": "甥舅" },
+        { "id": "hongshanqing", "name": "洪善卿", "relation": "亲戚", "label": "甥舅" }
         { "id": "zhangxiaocun", "name": "张小村", "relation": "赌友", "label": "同乡" },
         { "id": "luxiubao", "name": "陆秀宝", "relation": "相好", "label": "幺二" },
         { "id": "wangaer", "name": "王阿二", "relation": "相好", "label": "烟花间" },
         { "id": "aqiao", "name": "阿巧", "relation": "情人", "label": "后娶为妻" },
-        { "id": "zhaoerbao", "name": "赵二宝", "relation": "生意往来", "label": "妹妹" }
+        { "id": "zhaoerbao", "name": "赵二宝", "relation": "亲戚", "label": "妹妹" }
       ]
     },
     "wangliansheng": {
