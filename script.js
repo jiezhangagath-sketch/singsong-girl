@@ -115,6 +115,12 @@ async function loadStory() {
       data = await loadStoryViaXHR(storyPath + "?t=" + Date.now());
     }
     storyData = data;
+    try {
+      const relResponse = await fetch("data/relationships.json?t=" + Date.now());
+      window.relationshipData = await relResponse.json();
+    } catch (e) {
+      window.relationshipData = null;
+    }
     const hasProgress = loadProgress();
     if (!hasProgress) {
       resetGame();
@@ -164,6 +170,133 @@ function resetGame() {
   selectedCharacter = null;
   history = [];
   renderScene();
+}
+
+function renderRelationshipNetwork(charId, choice) {
+  const network = window.relationshipData?.networks?.[charId];
+  if (!network) {
+    enterStory(choice);
+    return;
+  }
+
+  choiceList.innerHTML = "";
+  choiceList.classList.remove("character-select-grid");
+
+  const container = document.createElement("div");
+  container.className = "relationship-network-container";
+
+  const title = document.createElement("h3");
+  title.className = "network-title";
+  title.innerText = network.center.name + "的人物关系";
+  container.appendChild(title);
+
+  const size = 420;
+  const centerX = size / 2;
+  const centerY = size / 2;
+  const radius = 140;
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 " + size + " " + size);
+  svg.setAttribute("class", "network-svg");
+
+  const nodeCount = network.nodes.length;
+  network.nodes.forEach((node, i) => {
+    const angle = (2 * Math.PI * i) / nodeCount - Math.PI / 2;
+    const x = centerX + radius * Math.cos(angle);
+    const y = centerY + radius * Math.sin(angle);
+
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", centerX);
+    line.setAttribute("y1", centerY);
+    line.setAttribute("x2", x);
+    line.setAttribute("y2", y);
+    line.setAttribute("class", "network-line");
+    svg.appendChild(line);
+
+    const midX = (centerX + x) / 2;
+    const midY = (centerY + y) / 2;
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute("x", midX);
+    text.setAttribute("y", midY);
+    text.setAttribute("class", "network-relation-text");
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    text.textContent = node.relation;
+    svg.appendChild(text);
+
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", x);
+    circle.setAttribute("cy", y);
+    circle.setAttribute("r", 34);
+    circle.setAttribute("class", "network-node-outer");
+    svg.appendChild(circle);
+
+    const nameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    nameText.setAttribute("x", x);
+    nameText.setAttribute("y", y + 2);
+    nameText.setAttribute("class", "network-node-text");
+    nameText.setAttribute("text-anchor", "middle");
+    nameText.setAttribute("dominant-baseline", "middle");
+    nameText.textContent = node.name;
+    svg.appendChild(nameText);
+
+    const labelText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    labelText.setAttribute("x", x);
+    labelText.setAttribute("y", y + 50);
+    labelText.setAttribute("class", "network-label-text");
+    labelText.setAttribute("text-anchor", "middle");
+    labelText.textContent = node.label;
+    svg.appendChild(labelText);
+  });
+
+  const centerCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  centerCircle.setAttribute("cx", centerX);
+  centerCircle.setAttribute("cy", centerY);
+  centerCircle.setAttribute("r", 46);
+  centerCircle.setAttribute("class", "network-node-center");
+  svg.appendChild(centerCircle);
+
+  const centerText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  centerText.setAttribute("x", centerX);
+  centerText.setAttribute("y", centerY + 2);
+  centerText.setAttribute("class", "network-center-text");
+  centerText.setAttribute("text-anchor", "middle");
+  centerText.setAttribute("dominant-baseline", "middle");
+  centerText.textContent = network.center.name;
+  svg.appendChild(centerText);
+
+  container.appendChild(svg);
+
+  const btnRow = document.createElement("div");
+  btnRow.className = "network-btn-row";
+
+  const backBtn = document.createElement("button");
+  backBtn.className = "button button-secondary";
+  backBtn.innerText = "返回选择";
+  backBtn.addEventListener("click", () => {
+    renderScene();
+  });
+
+  const enterBtn = document.createElement("button");
+  enterBtn.className = "button button-primary";
+  enterBtn.innerText = "进入剧情";
+  enterBtn.addEventListener("click", () => {
+    enterStory(choice);
+  });
+
+  btnRow.appendChild(backBtn);
+  btnRow.appendChild(enterBtn);
+  container.appendChild(btnRow);
+
+  choiceList.appendChild(container);
+}
+
+function enterStory(choice) {
+  const appShell = document.querySelector(".app-shell");
+  appShell?.classList.remove("intro-phase");
+  setTimeout(() => {
+    doSelect(choice);
+  }, 650);
 }
 
 function getScene(sceneId) {
@@ -558,24 +691,12 @@ function selectChoice(choice) {
   }
 
   const isIntro = currentSceneId === storyData?.startScene;
+  if (isIntro && choice.character) {
+    renderRelationshipNetwork(choice.character, choice);
+    return;
+  }
   if (isIntro) {
-    // 退出序幕：先移除暗化，等过渡完成再跳转
-    const appShell = document.querySelector(".app-shell");
-    appShell?.classList.remove("intro-phase");
-    // 给选中的卡片加一个瞬时高亮反馈
-    const cards = choiceList.querySelectorAll(".character-select-card");
-    cards.forEach((card) => {
-      if (card.contains(document.activeElement) || card === document.activeElement) {
-        card.style.transform = "scale(1.06)";
-        card.style.borderColor = "var(--accent)";
-      } else {
-        card.style.opacity = "0.3";
-        card.style.filter = "grayscale(0.6)";
-      }
-    });
-    setTimeout(() => {
-      doSelect(choice);
-    }, 650);
+    enterStory(choice);
     return;
   }
 

@@ -1,0 +1,66 @@
+{
+  "networks": {
+    "zhaopuzhai": {
+      "center": { "id": "zhaopuzhai", "name": "赵朴斋" },
+      "nodes": [
+        { "id": "hongshanqing", "name": "洪善卿", "relation": "生意往来", "label": "甥舅" },
+        { "id": "zhangxiaocun", "name": "张小村", "relation": "赌友", "label": "同乡" },
+        { "id": "luxiubao", "name": "陆秀宝", "relation": "相好", "label": "幺二" },
+        { "id": "wangaer", "name": "王阿二", "relation": "相好", "label": "烟花间" },
+        { "id": "aqiao", "name": "阿巧", "relation": "情人", "label": "后娶为妻" },
+        { "id": "zhaoerbao", "name": "赵二宝", "relation": "生意往来", "label": "妹妹" }
+      ]
+    },
+    "wangliansheng": {
+      "center": { "id": "wangliansheng", "name": "王莲生" },
+      "nodes": [
+        { "id": "shenxiaohong", "name": "沈小红", "relation": "相好", "label": "三四年老相好" },
+        { "id": "zhanghuizhen", "name": "张蕙贞", "relation": "相好", "label": "后娶为妾" },
+        { "id": "tangxiaoan", "name": "汤啸庵", "relation": "生意往来", "label": "朋友" },
+        { "id": "hongshanqing", "name": "洪善卿", "relation": "生意往来", "label": "朋友" },
+        { "id": "luozifu", "name": "罗子富", "relation": "赌友", "label": "朋友" },
+        { "id": "huangerjie", "name": "黄二姐", "relation": "鸨母", "label": "沈小红家" },
+        { "id": "xiaoliuer", "name": "小柳儿", "relation": "情人", "label": "沈小红姘头" }
+      ]
+    },
+    "huangcuifeng": {
+      "center": { "id": "huangcuifeng", "name": "黄翠凤" },
+      "nodes": [
+        { "id": "luozifu", "name": "罗子富", "relation": "恩客", "label": "主要客人" },
+        { "id": "huangerjie", "name": "黄二姐", "relation": "鸨母", "label": "也是亲妈" },
+        { "id": "qianzigang", "name": "钱子刚", "relation": "恩客", "label": "客人" },
+        { "id": "zhusanjie", "name": "诸三姐", "relation": "生意往来", "label": "丫鬟" },
+        { "id": "shenxiaohong", "name": "沈小红", "relation": "生意往来", "label": "同行" }
+      ]
+    },
+    "shenxiaohong": {
+      "center": { "id": "shenxiaohong", "name": "沈小红" },
+      "nodes": [
+        { "id": "wangliansheng", "name": "王莲生", "relation": "相好", "label": "老相好" },
+        { "id": "xiaoliuer", "name": "小柳儿", "relation": "情人", "label": "姘头·武小生" },
+        { "id": "zhanghuizhen", "name": "张蕙贞", "relation": "生意往来", "label": "情敌" },
+        { "id": "azhu", "name": "阿珠", "relation": "生意往来", "label": "娘姨" },
+        { "id": "ajinda", "name": "阿金大", "relation": "生意往来", "label": "大姐" },
+        { "id": "huangerjie", "name": "黄二姐", "relation": "鸨母", "label": "鸨母" }
+      ]
+    },
+    "kuanger": {
+      "center": { "id": "kuanger", "name": "匡二" },
+      "nodes": [
+        { "id": "liheting", "name": "李鹤汀", "relation": "生意往来", "label": "主人" },
+        { "id": "tumingzhu", "name": "屠明珠", "relation": "生意往来", "label": "被评点的倌人" },
+        { "id": "pansan", "name": "潘三", "relation": "情人", "label": "大兴里私娼" },
+        { "id": "silaoye", "name": "四老爷", "relation": "生意往来", "label": "跟踪对象" }
+      ]
+    },
+    "ajin": {
+      "center": { "id": "ajin", "name": "阿金" },
+      "nodes": [
+        { "id": "zhoushuangzhu", "name": "周双珠", "relation": "生意往来", "label": "服侍的倌人" },
+        { "id": "adebao", "name": "阿德保", "relation": "情人", "label": "丈夫" },
+        { "id": "zhangshou", "name": "张寿", "relation": "情人", "label": "姘头·朱蔼人管家" },
+        { "id": "zhoulan", "name": "周兰", "relation": "鸨母", "label": "双珠的妈" }
+      ]
+    }
+  }
+}

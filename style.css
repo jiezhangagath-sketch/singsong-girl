@@ -749,3 +749,85 @@ body {
     -webkit-line-clamp: 2;
   }
 }
+
+/* ── 角色关系网 ── */
+.relationship-network-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 24px;
+  background: var(--paper-light);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+}
+
+.network-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.network-svg {
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+  display: block;
+}
+
+.network-line {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.network-relation-text {
+  font-size: 11px;
+  fill: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.network-node-center {
+  fill: var(--accent);
+  stroke: var(--paper-dark);
+  stroke-width: 2;
+}
+
+.network-center-text {
+  font-size: 14px;
+  fill: #fff;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.network-node-outer {
+  fill: var(--paper-dark);
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+
+.network-node-text {
+  font-size: 12px;
+  fill: var(--ink);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.network-label-text {
+  font-size: 10px;
+  fill: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.network-btn-row {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.network-btn-row .button {
+  flex: 1;
+}
