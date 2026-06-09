@@ -97,14 +97,29 @@ body {
 }
 
 .app-shell.intro-phase .source-panel {
-  opacity: 0.08;
-  transition: opacity 1.4s ease;
+  display: none;
 }
 
 .app-shell.intro-phase .action-row {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.5s ease;
+}
+
+.app-shell.intro-phase {
+  min-height: calc(100vh - 32px);
+  justify-content: center;
+}
+
+.app-shell.intro-phase .content-grid {
+  justify-content: center;
+  width: 100%;
+}
+
+.app-shell.intro-phase .narrative {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
 }
 
 /* 退出序幕时平滑恢复 */
@@ -358,8 +373,8 @@ body {
 /* ── 角色选择网格（序幕专用）── */
 .choice-list.character-select-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
   padding: 4px 0 8px;
 }
 
@@ -757,6 +772,8 @@ body {
   align-items: center;
   gap: 18px;
   padding: 24px;
+  width: 100%;
+  box-sizing: border-box;
   background: var(--paper-light);
   border: 1px solid var(--border-light);
   border-radius: 4px;
@@ -772,7 +789,7 @@ body {
 
 .network-svg {
   width: 100%;
-  max-width: 460px;
+  max-width: 720px;
   height: auto;
   display: block;
 }
@@ -786,6 +803,13 @@ body {
 
 .network-btn-row .button {
   flex: 1;
+}
+
+/* 连线（半球面网络用） */
+.network-line {
+  fill: none;
+  stroke: var(--border);
+  stroke-linecap: round;
 }
 
 /* 灵动曲线连线 */
@@ -847,11 +871,39 @@ body {
   stroke-width: 2.5;
 }
 
+/* 远端节点 */
+.network-node-far {
+  fill: #f0ebe0;
+  stroke: var(--border-light);
+  stroke-width: 1;
+  transition: all 0.3s ease;
+}
+
+.network-node-far:hover {
+  fill: var(--paper-light);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+/* 远端节点文字 */
+.network-node-far-text {
+  font-size: 10px;
+  fill: var(--text-muted);
+  font-weight: 500;
+}
+
 /* 中心节点增强 */
 .network-node-center {
   fill: var(--accent);
   stroke: var(--paper-light);
   stroke-width: 3;
+}
+
+.network-node-center-ring {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  opacity: 0.5;
 }
 
 /* 关系文字 */
@@ -862,12 +914,28 @@ body {
   letter-spacing: 0.06em;
 }
 
-/* 外围节点文字 */
-.network-node-text {
-  font-size: 12px;
+/* 直接关系文字 */
+.network-node-text-direct {
+  font-size: 13px;
   fill: var(--ink);
   font-weight: 600;
   letter-spacing: 0.03em;
+}
+
+/* 间接关系文字 */
+.network-node-text-indirect {
+  font-size: 12px;
+  fill: var(--ink);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* 更远关系文字 */
+.network-node-text-far {
+  font-size: 11px;
+  fill: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 /* 标签文字 */

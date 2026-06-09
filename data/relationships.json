@@ -1,66 +1,844 @@
 {
-  "networks": {
-    "zhaopuzhai": {
-      "center": { "id": "zhaopuzhai", "name": "赵朴斋" },
-      "nodes": [
-        { "id": "hongshanqing", "name": "洪善卿", "relation": "亲戚", "label": "甥舅" }
-        { "id": "zhangxiaocun", "name": "张小村", "relation": "赌友", "label": "同乡" },
-        { "id": "luxiubao", "name": "陆秀宝", "relation": "相好", "label": "幺二" },
-        { "id": "wangaer", "name": "王阿二", "relation": "相好", "label": "烟花间" },
-        { "id": "aqiao", "name": "阿巧", "relation": "情人", "label": "后娶为妻" },
-        { "id": "zhaoerbao", "name": "赵二宝", "relation": "亲戚", "label": "妹妹" }
-      ]
+  "nodes": [
+    {
+      "id": "qiaolao",
+      "name": "乔老四",
+      "category": "client"
     },
-    "wangliansheng": {
-      "center": { "id": "wangliansheng", "name": "王莲生" },
-      "nodes": [
-        { "id": "shenxiaohong", "name": "沈小红", "relation": "相好", "label": "三四年老相好" },
-        { "id": "zhanghuizhen", "name": "张蕙贞", "relation": "相好", "label": "后娶为妾" },
-        { "id": "tangxiaoan", "name": "汤啸庵", "relation": "生意往来", "label": "朋友" },
-        { "id": "hongshanqing", "name": "洪善卿", "relation": "生意往来", "label": "朋友" },
-        { "id": "luozifu", "name": "罗子富", "relation": "赌友", "label": "朋友" },
-        { "id": "huangerjie", "name": "黄二姐", "relation": "鸨母", "label": "沈小红家" },
-        { "id": "xiaoliuer", "name": "小柳儿", "relation": "情人", "label": "沈小红姘头" }
-      ]
+    {
+      "id": "kuanger",
+      "name": "匡二",
+      "category": "client"
     },
-    "huangcuifeng": {
-      "center": { "id": "huangcuifeng", "name": "黄翠凤" },
-      "nodes": [
-        { "id": "luozifu", "name": "罗子富", "relation": "恩客", "label": "主要客人" },
-        { "id": "huangerjie", "name": "黄二姐", "relation": "鸨母", "label": "也是亲妈" },
-        { "id": "qianzigang", "name": "钱子刚", "relation": "恩客", "label": "客人" },
-        { "id": "zhusanjie", "name": "诸三姐", "relation": "生意往来", "label": "丫鬟" },
-        { "id": "shenxiaohong", "name": "沈小红", "relation": "生意往来", "label": "同行" }
-      ]
+    {
+      "id": "shisan",
+      "name": "史三公子",
+      "category": "client"
     },
-    "shenxiaohong": {
-      "center": { "id": "shenxiaohong", "name": "沈小红" },
-      "nodes": [
-        { "id": "wangliansheng", "name": "王莲生", "relation": "相好", "label": "老相好" },
-        { "id": "xiaoliuer", "name": "小柳儿", "relation": "情人", "label": "姘头·武小生" },
-        { "id": "zhanghuizhen", "name": "张蕙贞", "relation": "生意往来", "label": "情敌" },
-        { "id": "azhu", "name": "阿珠", "relation": "生意往来", "label": "娘姨" },
-        { "id": "ajinda", "name": "阿金大", "relation": "生意往来", "label": "大姐" },
-        { "id": "huangerjie", "name": "黄二姐", "relation": "鸨母", "label": "鸨母" }
-      ]
+    {
+      "id": "lvjiechen",
+      "name": "吕杰臣",
+      "category": "other"
     },
-    "kuanger": {
-      "center": { "id": "kuanger", "name": "匡二" },
-      "nodes": [
-        { "id": "liheting", "name": "李鹤汀", "relation": "生意往来", "label": "主人" },
-        { "id": "tumingzhu", "name": "屠明珠", "relation": "生意往来", "label": "被评点的倌人" },
-        { "id": "pansan", "name": "潘三", "relation": "情人", "label": "大兴里私娼" },
-        { "id": "silaoye", "name": "四老爷", "relation": "生意往来", "label": "跟踪对象" }
-      ]
+    {
+      "id": "zhoulan",
+      "name": "周兰",
+      "category": "madam"
     },
-    "ajin": {
-      "center": { "id": "ajin", "name": "阿金" },
-      "nodes": [
-        { "id": "zhoushuangzhu", "name": "周双珠", "relation": "生意往来", "label": "服侍的倌人" },
-        { "id": "adebao", "name": "阿德保", "relation": "情人", "label": "丈夫" },
-        { "id": "zhangshou", "name": "张寿", "relation": "情人", "label": "姘头·朱蔼人管家" },
-        { "id": "zhoulan", "name": "周兰", "relation": "鸨母", "label": "双珠的妈" }
-      ]
+    {
+      "id": "zhoushuangyu",
+      "name": "周双玉",
+      "category": "courtesan"
+    },
+    {
+      "id": "zhoushuangzhu",
+      "name": "周双珠",
+      "category": "courtesan"
+    },
+    {
+      "id": "zhouzhanhe",
+      "name": "周少和",
+      "category": "client"
+    },
+    {
+      "id": "xiaoliuer",
+      "name": "小柳儿",
+      "category": "courtesan"
+    },
+    {
+      "id": "tumingzhu",
+      "name": "屠明珠",
+      "category": "courtesan"
+    },
+    {
+      "id": "zhuanglifang",
+      "name": "庄荔甫",
+      "category": "client"
+    },
+    {
+      "id": "zhangshou",
+      "name": "张寿",
+      "category": "servant"
+    },
+    {
+      "id": "zhangxiaocun",
+      "name": "张小村",
+      "category": "other"
+    },
+    {
+      "id": "zhangxiuying",
+      "name": "张秀英",
+      "category": "other"
+    },
+    {
+      "id": "zhanghuizhen",
+      "name": "张蕙贞",
+      "category": "courtesan"
+    },
+    {
+      "id": "shiruisheng",
+      "name": "施瑞生",
+      "category": "client"
+    },
+    {
+      "id": "shuiruisheng",
+      "name": "施瑞生",
+      "category": "other"
+    },
+    {
+      "id": "zhushuren",
+      "name": "朱淑人",
+      "category": "client"
+    },
+    {
+      "id": "zhuairen",
+      "name": "朱蔼人",
+      "category": "other"
+    },
+    {
+      "id": "lishifu",
+      "name": "李实夫",
+      "category": "client"
+    },
+    {
+      "id": "liheting",
+      "name": "李鹤汀",
+      "category": "client"
+    },
+    {
+      "id": "yangyuanyuan",
+      "name": "杨媛媛",
+      "category": "courtesan"
+    },
+    {
+      "id": "yangliutang",
+      "name": "杨柳堂",
+      "category": "client"
+    },
+    {
+      "id": "shaosan",
+      "name": "殳三",
+      "category": "client"
+    },
+    {
+      "id": "tangxiaoan",
+      "name": "汤啸庵",
+      "category": "client"
+    },
+    {
+      "id": "shenxiaohong",
+      "name": "沈小红",
+      "category": "courtesan"
+    },
+    {
+      "id": "hongshanqing",
+      "name": "洪善卿",
+      "category": "client"
+    },
+    {
+      "id": "pansan",
+      "name": "潘三",
+      "category": "courtesan"
+    },
+    {
+      "id": "wangliansheng",
+      "name": "王莲生",
+      "category": "client"
+    },
+    {
+      "id": "wangaer",
+      "name": "王阿二",
+      "category": "courtesan"
+    },
+    {
+      "id": "luozifu",
+      "name": "罗子富",
+      "category": "client"
+    },
+    {
+      "id": "zhusanjie",
+      "name": "诸三姐",
+      "category": "madam"
+    },
+    {
+      "id": "laigongzi",
+      "name": "赖公子",
+      "category": "client"
+    },
+    {
+      "id": "zhaoerbao",
+      "name": "赵二宝",
+      "category": "courtesan"
+    },
+    {
+      "id": "zhaopuzhai",
+      "name": "赵朴斋",
+      "category": "other"
+    },
+    {
+      "id": "zhaohongshi",
+      "name": "赵洪氏",
+      "category": "other"
+    },
+    {
+      "id": "jinqiaozhen",
+      "name": "金巧珍",
+      "category": "courtesan"
+    },
+    {
+      "id": "jinaizhen",
+      "name": "金爱珍",
+      "category": "courtesan"
+    },
+    {
+      "id": "qianzigang",
+      "name": "钱子刚",
+      "category": "client"
+    },
+    {
+      "id": "changfu",
+      "name": "长福",
+      "category": "servant"
+    },
+    {
+      "id": "aqiao",
+      "name": "阿巧",
+      "category": "servant"
+    },
+    {
+      "id": "adebao",
+      "name": "阿德保",
+      "category": "servant"
+    },
+    {
+      "id": "azhu",
+      "name": "阿珠",
+      "category": "courtesan"
+    },
+    {
+      "id": "ajin",
+      "name": "阿金",
+      "category": "courtesan"
+    },
+    {
+      "id": "ajinda",
+      "name": "阿金大",
+      "category": "courtesan"
+    },
+    {
+      "id": "luxiubao",
+      "name": "陆秀宝",
+      "category": "courtesan"
+    },
+    {
+      "id": "chenxiaoyun",
+      "name": "陈小云",
+      "category": "client"
+    },
+    {
+      "id": "huangerjie",
+      "name": "黄二姐",
+      "category": "madam"
+    },
+    {
+      "id": "huangcuifeng",
+      "name": "黄翠凤",
+      "category": "courtesan"
+    },
+    {
+      "id": "lizhuanhong",
+      "name": "黎篆鸿",
+      "category": "client"
+    },
+    {
+      "id": "jiangyueqin",
+      "name": "蒋月琴",
+      "category": "courtesan"
+    },
+    {
+      "id": "zhufeng",
+      "name": "珠凤",
+      "category": "courtesan"
+    },
+    {
+      "id": "jinfeng",
+      "name": "金凤",
+      "category": "courtesan"
+    },
+    {
+      "id": "qiyunsou",
+      "name": "齐韵叟",
+      "category": "client"
+    },
+    {
+      "id": "laian",
+      "name": "来安",
+      "category": "servant"
+    },
+    {
+      "id": "ahu",
+      "name": "阿虎",
+      "category": "servant"
+    }
+  ],
+  "edges": [
+    {
+      "source": "ajin",
+      "target": "adebao",
+      "relation": "情人"
+    },
+    {
+      "source": "ajin",
+      "target": "zhangshou",
+      "relation": "情人"
+    },
+    {
+      "source": "ajin",
+      "target": "zhoulan",
+      "relation": "鸨母"
+    },
+    {
+      "source": "ajin",
+      "target": "zhoushuangzhu",
+      "relation": "生意往来"
+    },
+    {
+      "source": "chenxiaoyun",
+      "target": "changfu",
+      "relation": "生意往来"
+    },
+    {
+      "source": "chenxiaoyun",
+      "target": "hongshanqing",
+      "relation": "朋友"
+    },
+    {
+      "source": "chenxiaoyun",
+      "target": "jinaizhen",
+      "relation": "生意往来"
+    },
+    {
+      "source": "chenxiaoyun",
+      "target": "jinqiaozhen",
+      "relation": "相好"
+    },
+    {
+      "source": "chenxiaoyun",
+      "target": "lizhuanhong",
+      "relation": "生意往来"
+    },
+    {
+      "source": "chenxiaoyun",
+      "target": "wangliansheng",
+      "relation": "朋友"
+    },
+    {
+      "source": "chenxiaoyun",
+      "target": "zhuairen",
+      "relation": "朋友"
+    },
+    {
+      "source": "chenxiaoyun",
+      "target": "zhuanglifang",
+      "relation": "朋友"
+    },
+    {
+      "source": "huangcuifeng",
+      "target": "huangerjie",
+      "relation": "鸨母"
+    },
+    {
+      "source": "huangcuifeng",
+      "target": "luozifu",
+      "relation": "恩客"
+    },
+    {
+      "source": "huangcuifeng",
+      "target": "qianzigang",
+      "relation": "恩客"
+    },
+    {
+      "source": "huangcuifeng",
+      "target": "shenxiaohong",
+      "relation": "生意往来"
+    },
+    {
+      "source": "huangcuifeng",
+      "target": "zhusanjie",
+      "relation": "生意往来"
+    },
+    {
+      "source": "jinqiaozhen",
+      "target": "jinaizhen",
+      "relation": "亲戚"
+    },
+    {
+      "source": "kuanger",
+      "target": "liheting",
+      "relation": "生意往来"
+    },
+    {
+      "source": "kuanger",
+      "target": "lishifu",
+      "relation": "生意往来"
+    },
+    {
+      "source": "kuanger",
+      "target": "pansan",
+      "relation": "情人"
+    },
+    {
+      "source": "kuanger",
+      "target": "tumingzhu",
+      "relation": "生意往来"
+    },
+    {
+      "source": "liheting",
+      "target": "lishifu",
+      "relation": "亲戚"
+    },
+    {
+      "source": "liheting",
+      "target": "lizhuanhong",
+      "relation": "生意往来"
+    },
+    {
+      "source": "liheting",
+      "target": "qiaolao",
+      "relation": "赌友"
+    },
+    {
+      "source": "liheting",
+      "target": "shaosan",
+      "relation": "赌友"
+    },
+    {
+      "source": "liheting",
+      "target": "yangyuanyuan",
+      "relation": "相好"
+    },
+    {
+      "source": "liheting",
+      "target": "zhouzhanhe",
+      "relation": "赌友"
+    },
+    {
+      "source": "shenxiaohong",
+      "target": "ajinda",
+      "relation": "生意往来"
+    },
+    {
+      "source": "shenxiaohong",
+      "target": "azhu",
+      "relation": "生意往来"
+    },
+    {
+      "source": "shenxiaohong",
+      "target": "xiaoliuer",
+      "relation": "情人"
+    },
+    {
+      "source": "shenxiaohong",
+      "target": "zhanghuizhen",
+      "relation": "生意往来"
+    },
+    {
+      "source": "wangliansheng",
+      "target": "hongshanqing",
+      "relation": "生意往来"
+    },
+    {
+      "source": "wangliansheng",
+      "target": "huangerjie",
+      "relation": "朋友"
+    },
+    {
+      "source": "wangliansheng",
+      "target": "luozifu",
+      "relation": "赌友"
+    },
+    {
+      "source": "wangliansheng",
+      "target": "shenxiaohong",
+      "relation": "相好"
+    },
+    {
+      "source": "wangliansheng",
+      "target": "tangxiaoan",
+      "relation": "生意往来"
+    },
+    {
+      "source": "wangliansheng",
+      "target": "zhanghuizhen",
+      "relation": "相好"
+    },
+    {
+      "source": "zhaoerbao",
+      "target": "hongshanqing",
+      "relation": "亲戚"
+    },
+    {
+      "source": "zhaoerbao",
+      "target": "laigongzi",
+      "relation": "恩客"
+    },
+    {
+      "source": "zhaoerbao",
+      "target": "shiruisheng",
+      "relation": "情人"
+    },
+    {
+      "source": "zhaoerbao",
+      "target": "shisan",
+      "relation": "情人"
+    },
+    {
+      "source": "zhaoerbao",
+      "target": "zhangxiuying",
+      "relation": "生意往来"
+    },
+    {
+      "source": "zhaoerbao",
+      "target": "zhaohongshi",
+      "relation": "亲戚"
+    },
+    {
+      "source": "zhaopuzhai",
+      "target": "aqiao",
+      "relation": "情人"
+    },
+    {
+      "source": "zhaopuzhai",
+      "target": "hongshanqing",
+      "relation": "亲戚"
+    },
+    {
+      "source": "zhaopuzhai",
+      "target": "luxiubao",
+      "relation": "相好"
+    },
+    {
+      "source": "zhaopuzhai",
+      "target": "wangaer",
+      "relation": "相好"
+    },
+    {
+      "source": "zhaopuzhai",
+      "target": "zhangxiaocun",
+      "relation": "赌友"
+    },
+    {
+      "source": "zhaopuzhai",
+      "target": "zhaoerbao",
+      "relation": "亲戚"
+    },
+    {
+      "source": "zhoushuangyu",
+      "target": "hongshanqing",
+      "relation": "相识"
+    },
+    {
+      "source": "zhoushuangyu",
+      "target": "zhoulan",
+      "relation": "鸨母"
+    },
+    {
+      "source": "zhoushuangyu",
+      "target": "zhoushuangzhu",
+      "relation": "姐妹"
+    },
+    {
+      "source": "zhoushuangyu",
+      "target": "zhuanglifang",
+      "relation": "生意往来"
+    },
+    {
+      "source": "zhoushuangyu",
+      "target": "zhushuren",
+      "relation": "情人"
+    },
+    {
+      "source": "zhoushuangzhu",
+      "target": "zhoulan",
+      "relation": "鸨母"
+    },
+    {
+      "source": "zhoushuangzhu",
+      "target": "zhushuren",
+      "relation": "生意往来"
+    },
+    {
+      "source": "zhuairen",
+      "target": "zhushuren",
+      "relation": "亲戚"
+    },
+    {
+      "source": "luozifu",
+      "target": "jiangyueqin",
+      "relation": "恩客"
+    },
+    {
+      "source": "hongshanqing",
+      "target": "zhoushuangzhu",
+      "relation": "恩客"
+    },
+    {
+      "source": "wangliansheng",
+      "target": "azhu",
+      "relation": "朋友"
+    },
+    {
+      "source": "zhanghuizhen",
+      "target": "hongshanqing",
+      "relation": "恩客"
+    },
+    {
+      "source": "luozifu",
+      "target": "huangerjie",
+      "relation": "朋友"
+    },
+    {
+      "source": "shenxiaohong",
+      "target": "hongshanqing",
+      "relation": "恩客"
+    },
+    {
+      "source": "zhanghuizhen",
+      "target": "azhu",
+      "relation": "朋友"
+    },
+    {
+      "source": "tangxiaoan",
+      "target": "luozifu",
+      "relation": "朋友"
+    },
+    {
+      "source": "huangerjie",
+      "target": "zhufeng",
+      "relation": "鸨母"
+    },
+    {
+      "source": "huangerjie",
+      "target": "jinfeng",
+      "relation": "鸨母"
+    },
+    {
+      "source": "huangerjie",
+      "target": "zhusanjie",
+      "relation": "朋友"
+    },
+    {
+      "source": "luozifu",
+      "target": "laian",
+      "relation": "主仆"
+    },
+    {
+      "source": "zhaoerbao",
+      "target": "ahu",
+      "relation": "主仆"
+    },
+    {
+      "source": "azhu",
+      "target": "zhoulan",
+      "relation": "主仆"
+    },
+    {
+      "source": "qiyunsou",
+      "target": "zhoushuangyu",
+      "relation": "恩客"
+    },
+    {
+      "source": "qiyunsou",
+      "target": "zhoushuangzhu",
+      "relation": "恩客"
+    }
+  ],
+  "labels": {
+    "hongshanqing|zhaopuzhai": {
+      "zhaopuzhai": "甥舅"
+    },
+    "zhangxiaocun|zhaopuzhai": {
+      "zhaopuzhai": "同乡"
+    },
+    "luxiubao|zhaopuzhai": {
+      "zhaopuzhai": "幺二"
+    },
+    "wangaer|zhaopuzhai": {
+      "zhaopuzhai": "烟花间"
+    },
+    "aqiao|zhaopuzhai": {
+      "zhaopuzhai": "后娶为妻"
+    },
+    "zhaoerbao|zhaopuzhai": {
+      "zhaopuzhai": "妹妹",
+      "zhaoerbao": "哥哥"
+    },
+    "shenxiaohong|wangliansheng": {
+      "wangliansheng": "三四年老相好",
+      "shenxiaohong": "老相好"
+    },
+    "wangliansheng|zhanghuizhen": {
+      "wangliansheng": "后娶为妾"
+    },
+    "tangxiaoan|wangliansheng": {
+      "wangliansheng": "朋友"
+    },
+    "hongshanqing|wangliansheng": {
+      "wangliansheng": "朋友"
+    },
+    "luozifu|wangliansheng": {
+      "wangliansheng": "朋友"
+    },
+    "huangerjie|wangliansheng": {
+      "wangliansheng": "沈小红家"
+    },
+    "huangcuifeng|luozifu": {
+      "huangcuifeng": "主要客人"
+    },
+    "huangcuifeng|huangerjie": {
+      "huangcuifeng": "也是亲妈"
+    },
+    "huangcuifeng|qianzigang": {
+      "huangcuifeng": "客人"
+    },
+    "huangcuifeng|zhusanjie": {
+      "huangcuifeng": "丫鬟"
+    },
+    "huangcuifeng|shenxiaohong": {
+      "huangcuifeng": "同行"
+    },
+    "shenxiaohong|xiaoliuer": {
+      "shenxiaohong": "姘头·武小生"
+    },
+    "shenxiaohong|zhanghuizhen": {
+      "shenxiaohong": "情敌"
+    },
+    "azhu|shenxiaohong": {
+      "shenxiaohong": "娘姨"
+    },
+    "ajinda|shenxiaohong": {
+      "shenxiaohong": "大姐"
+    },
+    "huangerjie|shenxiaohong": {
+      "shenxiaohong": "鸨母"
+    },
+    "kuanger|liheting": {
+      "kuanger": "主人",
+      "liheting": "管家·卷逃者"
+    },
+    "kuanger|tumingzhu": {
+      "kuanger": "被评点的倌人"
+    },
+    "kuanger|pansan": {
+      "kuanger": "大兴里私娼"
+    },
+    "kuanger|lishifu": {
+      "kuanger": "跟踪对象"
+    },
+    "ajin|zhoushuangzhu": {
+      "ajin": "服侍的倌人"
+    },
+    "adebao|ajin": {
+      "ajin": "丈夫"
+    },
+    "ajin|zhangshou": {
+      "ajin": "姘头·朱蔼人管家"
+    },
+    "ajin|zhoulan": {
+      "ajin": "双珠的妈"
+    },
+    "hongshanqing|zhaoerbao": {
+      "zhaoerbao": "舅舅"
+    },
+    "shiruisheng|zhaoerbao": {
+      "zhaoerbao": "引诱者·大少爷"
+    },
+    "shisan|zhaoerbao": {
+      "zhaoerbao": "说要娶她做大老婆"
+    },
+    "zhangxiuying|zhaoerbao": {
+      "zhaoerbao": "同房住的姐妹"
+    },
+    "zhaoerbao|zhaohongshi": {
+      "zhaoerbao": "母亲"
+    },
+    "laigongzi|zhaoerbao": {
+      "zhaoerbao": "打房间的恶少"
+    },
+    "liheting|lishifu": {
+      "liheting": "四老爷·堂叔"
+    },
+    "liheting|yangyuanyuan": {
+      "liheting": "尚仁里倌人"
+    },
+    "liheting|lizhuanhong": {
+      "liheting": "大老倌·酒局主人"
+    },
+    "liheting|shaosan": {
+      "liheting": "赌局合伙人"
+    },
+    "liheting|qiaolao": {
+      "liheting": "同输者"
+    },
+    "liheting|zhouzhanhe": {
+      "liheting": "引赌者"
+    },
+    "jiangyueqin|luozifu": {
+      "luozifu": "恩客"
+    },
+    "hongshanqing|zhoushuangzhu": {
+      "hongshanqing": "恩客"
+    },
+    "azhu|wangliansheng": {
+      "wangliansheng": "朋友"
+    },
+    "hongshanqing|zhanghuizhen": {
+      "zhanghuizhen": "恩客"
+    },
+    "huangerjie|luozifu": {
+      "luozifu": "朋友"
+    },
+    "hongshanqing|shenxiaohong": {
+      "shenxiaohong": "恩客"
+    },
+    "azhu|zhanghuizhen": {
+      "zhanghuizhen": "朋友"
+    },
+    "luozifu|tangxiaoan": {
+      "tangxiaoan": "朋友"
+    },
+    "huangerjie|zhufeng": {
+      "zhufeng": "鸨母"
+    },
+    "huangerjie|jinfeng": {
+      "jinfeng": "鸨母"
+    },
+    "huangerjie|zhusanjie": {
+      "zhusanjie": "朋友"
+    },
+    "laian|luozifu": {
+      "laian": "主仆"
+    },
+    "ahu|zhaoerbao": {
+      "ahu": "主仆"
+    },
+    "azhu|zhoulan": {
+      "azhu": "主仆"
+    },
+    "qiyunsou|zhoushuangyu": {
+      "zhoushuangyu": "恩客"
+    },
+    "qiyunsou|zhuairren": {
+      "zhuairren": "朋友"
+    },
+    "qiyunsou|zhoushuangzhu": {
+      "zhoushuangzhu": "恩客"
+    },
+    "hongshanqing|zhoushuangyu": {
+      "hongshanqing": "相识"
+    },
+    "zhoushuangyu|zhoushuangzhu": {
+      "zhoushuangyu": "姐妹"
     }
   }
 }

@@ -172,10 +172,13 @@ function resetGame() {
   renderScene();
 }
 
-function renderRelationshipNetwork(charId, choice) {
-  const network = window.relationshipData?.networks?.[charId];
-  if (!network) {
-    enterStory(choice);
+function renderRelationshipNetwork(centerId, choice) {
+  const nodes = window.relationshipData?.nodes || [];
+  const edges = window.relationshipData?.edges || [];
+
+  const centerNode = nodes.find(n => n.id === centerId);
+  if (!centerNode) {
+    if (choice) enterStory(choice);
     return;
   }
 
@@ -184,170 +187,276 @@ function renderRelationshipNetwork(charId, choice) {
 
   const container = document.createElement("div");
   container.className = "relationship-network-container";
+  container.style.width = "100%";
+  container.style.maxWidth = "900px";
 
   const title = document.createElement("h3");
   title.className = "network-title";
-  title.innerText = network.center.name + "的人物关系";
+  title.innerText = centerNode.name + "的人物关系网";
   container.appendChild(title);
 
-  const size = 460;
-  const centerX = size / 2;
-  const centerY = size / 2;
-  const radius = 155;
+  // ECharts 容器
+  const chartDiv = document.createElement("div");
+  chartDiv.style.width = "100%";
+  chartDiv.style.height = "600px";
+  container.appendChild(chartDiv);
 
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 " + size + " " + size);
-  svg.setAttribute("class", "network-svg");
-
-  const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-  const filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
-  filter.setAttribute("id", "nodeShadow");
-  filter.setAttribute("x", "-30%");
-  filter.setAttribute("y", "-30%");
-  filter.setAttribute("width", "160%");
-  filter.setAttribute("height", "160%");
-  filter.innerHTML = `
-    <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#7a4f32" flood-opacity="0.15"/>
-  `;
-  defs.appendChild(filter);
-  svg.appendChild(defs);
-
-  const nodeCount = network.nodes.length;
-  const nodePositions = [];
-
-  // 计算节点位置
-  network.nodes.forEach((node, i) => {
-    const angle = (2 * Math.PI * i) / nodeCount - Math.PI / 2;
-    const x = centerX + radius * Math.cos(angle);
-    const y = centerY + radius * Math.sin(angle);
-    nodePositions.push({ x, y, angle, node });
+  // 计算每个节点的连接数（degree）
+  const degree = {};
+  nodes.forEach(n => degree[n.id] = 0);
+  edges.forEach(e => {
+    degree[e.source] = (degree[e.source] || 0) + 1;
+    degree[e.target] = (degree[e.target] || 0) + 1;
   });
 
-  // 绘制柔和曲线连线 + 关系标签
-  nodePositions.forEach((pos, i) => {
-    const { x, y, angle, node } = pos;
+  // BFS 计算距离（以 centerId 为中心）
+  const distances = {};
+  nodes.forEach(n => distances[n.id] = Infinity);
+  distances[centerId] = 0;
+  const queue = [centerId];
+  let head = 0;
+  while (head < queue.length) {
+    const cur = queue[head++];
+    edges.forEach(e => {
+      if (e.source === cur && distances[e.target] === Infinity) {
+        distances[e.target] = distances[cur] + 1;
+        queue.push(e.target);
+      } else if (e.target === cur && distances[e.source] === Infinity) {
+        distances[e.source] = distances[cur] + 1;
+        queue.push(e.source);
+      }
+    });
+  }
 
-    // 二次贝塞尔曲线控制点：向外偏移，形成柔和弧线
-    const controlDist = radius * 0.35;
-    const controlX = centerX + controlDist * Math.cos(angle);
-    const controlY = centerY + controlDist * Math.sin(angle);
+  // 类别配置
+  const categories = [
+    { name: '倌人', itemStyle: { color: '#c23531' } },
+    { name: '嫖客', itemStyle: { color: '#2f4554' } },
+    { name: '老鸨', itemStyle: { color: '#d48265' } },
+    { name: '仆人', itemStyle: { color: '#91c7ae' } },
+    { name: '其他', itemStyle: { color: '#bda29a' } }
+  ];
 
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("d", `M ${centerX},${centerY} Q ${controlX},${controlY} ${x},${y}`);
-    path.setAttribute("class", "network-curve");
-    path.style.animationDelay = (i * 0.1) + "s";
-    svg.appendChild(path);
+  const categoryNames = ['courtesan', 'client', 'madam', 'servant', 'other'];
+  const categoryIndex = {};
+  categoryNames.forEach((name, i) => categoryIndex[name] = i);
 
-    // 关系标签背景（沿曲线中点偏外）
-    const t = 0.55;
-    const qx = (1 - t) * (1 - t) * centerX + 2 * (1 - t) * t * controlX + t * t * x;
-    const qy = (1 - t) * (1 - t) * centerY + 2 * (1 - t) * t * controlY + t * t * y;
+  // 统一关系词
+  function getRelationLabel(edge, fromCenter) {
+    const r = edge.relation;
+    if (r === '生意往来') return '生意往来';
+    if (r === '亲戚') return '亲戚';
+    if (r === '朋友' || r === '赌友') return '朋友';
+    if (r === '相识') return '相识';
+    if (r === '姐妹') return '\"姐妹\"';
+    if (r === '恩客') {
+      return fromCenter === edge.source ? '恩客' : '相好';
+    }
+    if (r === '相好') {
+      return fromCenter === edge.source ? '相好' : '恩客';
+    }
+    if (r === '情人') return '朋友';
+    if (r === '鸨母') {
+      return fromCenter === edge.source ? '鸨母' : '手下';
+    }
+    if (r === '主仆') {
+      return fromCenter === edge.source ? '主仆' : '服侍';
+    }
+    return r;
+  }
 
-    const bgRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    const textWidth = node.relation.length * 13 + 10;
-    bgRect.setAttribute("x", qx - textWidth / 2);
-    bgRect.setAttribute("y", qy - 10);
-    bgRect.setAttribute("width", textWidth);
-    bgRect.setAttribute("height", 20);
-    bgRect.setAttribute("rx", 10);
-    bgRect.setAttribute("class", "network-tag-bg");
-    svg.appendChild(bgRect);
+  // 连线颜色映射
+  function getEdgeColor(relation) {
+    if (relation === '恩客' || relation === '相好') return '#c23531';
+    if (relation === '亲戚') return '#8B4513';
+    if (relation === '主仆' || relation === '打工') return '#2f4554';
+    if (relation === '鸨母') return '#d48265';
+    return '#999999';
+  }
 
-    const relText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    relText.setAttribute("x", qx);
-    relText.setAttribute("y", qy + 3);
-    relText.setAttribute("class", "network-relation-text");
-    relText.setAttribute("text-anchor", "middle");
-    relText.setAttribute("dominant-baseline", "middle");
-    relText.textContent = node.relation;
-    svg.appendChild(relText);
+  function getEdgeType(relation) {
+    if (relation === '主仆' || relation === '打工') return 'dashed';
+    return 'solid';
+  }
+
+  // 构建 ECharts 节点数据
+  const graphNodes = nodes.map(n => {
+    const dist = distances[n.id] === Infinity ? 99 : distances[n.id];
+    const isCenter = n.id === centerId;
+    const baseSize = isCenter ? 55 : dist === 1 ? 42 : dist === 2 ? 34 : 28;
+    const size = baseSize + Math.min(degree[n.id] || 0, 8) * 2;
+    const opacity = isCenter ? 1.0 : dist === 1 ? 0.95 : dist === 2 ? 0.5 : 0.2;
+    const catIdx = categoryIndex[n.category] || 5;
+
+    return {
+      id: n.id,
+      name: n.name,
+      value: degree[n.id] || 0,
+      category: catIdx,
+      symbolSize: size,
+      itemStyle: {
+        opacity: opacity,
+        borderColor: isCenter ? '#fff' : 'transparent',
+        borderWidth: isCenter ? 3 : 0,
+        shadowBlur: isCenter ? 20 : 0,
+        shadowColor: isCenter ? 'rgba(194, 53, 49, 0.4)' : 'transparent'
+      },
+      label: {
+        show: true,
+        fontSize: isCenter ? 15 : dist === 1 ? 13 : dist === 2 ? 12 : 10,
+        fontWeight: isCenter ? 700 : 500,
+        color: isCenter ? '#fff' : (catIdx === 0 || catIdx === 1) ? '#fff' : '#333'
+      },
+      _dist: dist,
+      _isCenter: isCenter
+    };
+  }).filter(n => n._dist <= 3 || n._isCenter);
+
+  const visibleNodeIds = new Set(graphNodes.map(n => n.id));
+
+  // 构建 ECharts 连线数据
+  const graphEdges = edges.map(e => {
+    const label = getRelationLabel(e, centerId);
+    const isCenterEdge = e.source === centerId || e.target === centerId;
+    const p1 = graphNodes.find(n => n.id === e.source);
+    const p2 = graphNodes.find(n => n.id === e.target);
+    if (!p1 || !p2) return null;
+
+    const avgOpacity = (p1.itemStyle.opacity + p2.itemStyle.opacity) / 2;
+    return {
+      source: e.source,
+      target: e.target,
+      value: label,
+      lineStyle: {
+        color: getEdgeColor(e.relation),
+        type: getEdgeType(e.relation),
+        width: isCenterEdge ? 2 : 1,
+        opacity: isCenterEdge ? Math.max(0.4, avgOpacity * 0.8) : avgOpacity * 0.4,
+        curveness: 0.15
+      },
+      label: {
+        show: avgOpacity > 0.4,
+        formatter: label,
+        fontSize: 10,
+        color: '#666'
+      }
+    };
+  }).filter(e => e !== null);
+
+  choiceList.appendChild(container);
+
+  // 初始化 ECharts（必须在容器插入 DOM 之后）
+  const chart = echarts.init(chartDiv);
+
+  const option = {
+    tooltip: {
+      trigger: 'item',
+      formatter: function(params) {
+        if (params.dataType === 'node') {
+          const catName = categories[params.data.category]?.name || '其他';
+          return `<b>${params.name}</b><br/>类别：${catName}`;
+        }
+        return `${params.data.value}`;
+      }
+    },
+    legend: {
+      data: categories.map(c => c.name),
+      top: 10,
+      left: 10,
+      textStyle: { fontSize: 12, color: '#666' }
+    },
+    series: [{
+      type: 'graph',
+      layout: 'force',
+      roam: true,  // 支持缩放/平移
+      draggable: true,
+      data: graphNodes,
+      links: graphEdges,
+      categories: categories,
+      focusNodeAdjacency: true,
+      force: {
+        repulsion: 1200,
+        gravity: 0.05,
+        edgeLength: [100, 250],
+        layoutAnimation: true
+      },
+      edgeSymbol: ['none', 'none'],
+      label: {
+        show: true,
+        position: 'inside',
+        formatter: '{b}'
+      },
+      emphasis: {
+        focus: 'adjacency',
+        lineStyle: {
+          width: 3
+        }
+      },
+      lineStyle: {
+        curveness: 0.15
+      }
+    }]
+  };
+
+  chart.setOption(option);
+
+  // 限制缩放范围（防止过度缩小）
+  const MIN_ZOOM = 0.6;
+  const MAX_ZOOM = 2.5;
+  chart.getZr().on('mousewheel', function() {
+    setTimeout(function() {
+      const opt = chart.getOption();
+      const zoom = (opt.series && opt.series[0] && opt.series[0].zoom) || 1;
+      if (zoom < MIN_ZOOM) {
+        chart.setOption({ series: [{ zoom: MIN_ZOOM }] });
+      } else if (zoom > MAX_ZOOM) {
+        chart.setOption({ series: [{ zoom: MAX_ZOOM }] });
+      }
+    }, 10);
   });
 
-  // 外围节点（带入场动画）
-  nodePositions.forEach((pos, i) => {
-    const { x, y, node } = pos;
-
-    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    g.setAttribute("class", "network-node-group");
-    g.style.animationDelay = (0.3 + i * 0.12) + "s";
-
-    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", x);
-    circle.setAttribute("cy", y);
-    circle.setAttribute("r", 36);
-    circle.setAttribute("class", "network-node-outer");
-    circle.setAttribute("filter", "url(#nodeShadow)");
-    g.appendChild(circle);
-
-    const nameText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    nameText.setAttribute("x", x);
-    nameText.setAttribute("y", y + 2);
-    nameText.setAttribute("class", "network-node-text");
-    nameText.setAttribute("text-anchor", "middle");
-    nameText.setAttribute("dominant-baseline", "middle");
-    nameText.textContent = node.name;
-    g.appendChild(nameText);
-
-    const labelText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    labelText.setAttribute("x", x);
-    labelText.setAttribute("y", y + 54);
-    labelText.setAttribute("class", "network-label-text");
-    labelText.setAttribute("text-anchor", "middle");
-    labelText.textContent = node.label;
-    g.appendChild(labelText);
-
-    svg.appendChild(g);
+  // 点击节点切换中心
+  chart.on('click', function(params) {
+    if (params.dataType === 'node') {
+      const clickedId = params.data.id;
+      if (clickedId !== centerId) {
+        const introScene = storyData.scenes.find(s => s.id === storyData.startScene);
+        const nextChoice = introScene?.choices?.find(c => c.character === clickedId);
+        renderRelationshipNetwork(clickedId, nextChoice);
+      }
+    }
   });
 
-  // 中心节点
-  const centerG = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  centerG.setAttribute("class", "network-node-group");
-  centerG.style.animationDelay = "0s";
+  // 响应窗口大小变化
+  window.addEventListener('resize', function() {
+    chart.resize();
+  });
 
-  const centerCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-  centerCircle.setAttribute("cx", centerX);
-  centerCircle.setAttribute("cy", centerY);
-  centerCircle.setAttribute("r", 48);
-  centerCircle.setAttribute("class", "network-node-center");
-  centerCircle.setAttribute("filter", "url(#nodeShadow)");
-  centerG.appendChild(centerCircle);
-
-  const centerText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  centerText.setAttribute("x", centerX);
-  centerText.setAttribute("y", centerY + 3);
-  centerText.setAttribute("class", "network-center-text");
-  centerText.setAttribute("text-anchor", "middle");
-  centerText.setAttribute("dominant-baseline", "middle");
-  centerText.textContent = network.center.name;
-  centerG.appendChild(centerText);
-
-  svg.appendChild(centerG);
-  container.appendChild(svg);
-
+  // 按钮行
   const btnRow = document.createElement("div");
   btnRow.className = "network-btn-row";
 
   const backBtn = document.createElement("button");
   backBtn.className = "button button-secondary";
   backBtn.innerText = "返回选择";
-  backBtn.addEventListener("click", () => {
-    renderScene();
-  });
+  backBtn.addEventListener("click", () => renderScene());
 
   const enterBtn = document.createElement("button");
-  enterBtn.className = "button button-primary";
-  enterBtn.innerText = "进入剧情";
-  enterBtn.addEventListener("click", () => {
-    enterStory(choice);
-  });
+  if (choice) {
+    enterBtn.className = "button button-primary";
+    enterBtn.innerText = "进入剧情";
+    enterBtn.addEventListener("click", () => enterStory(choice));
+  } else {
+    enterBtn.className = "button button-secondary";
+    enterBtn.innerText = "该角色暂无剧情";
+    enterBtn.disabled = true;
+    enterBtn.style.opacity = "0.6";
+  }
 
   btnRow.appendChild(backBtn);
   btnRow.appendChild(enterBtn);
   container.appendChild(btnRow);
-
-  choiceList.appendChild(container);
 }
-
 function enterStory(choice) {
   const appShell = document.querySelector(".app-shell");
   appShell?.classList.remove("intro-phase");
