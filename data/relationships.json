@@ -543,11 +543,6 @@
       "relation": "生意往来"
     },
     {
-      "source": "zhoushuangyu",
-      "target": "zhushuren",
-      "relation": "情人"
-    },
-    {
       "source": "zhoushuangzhu",
       "target": "zhoulan",
       "relation": "鸨母"
@@ -555,7 +550,7 @@
     {
       "source": "zhoushuangzhu",
       "target": "zhushuren",
-      "relation": "生意往来"
+      "relation": "相识"
     },
     {
       "source": "zhuairen",
@@ -580,12 +575,7 @@
     {
       "source": "zhanghuizhen",
       "target": "hongshanqing",
-      "relation": "恩客"
-    },
-    {
-      "source": "luozifu",
-      "target": "huangerjie",
-      "relation": "朋友"
+      "relation": "相识"
     },
     {
       "source": "shenxiaohong",
@@ -595,7 +585,7 @@
     {
       "source": "zhanghuizhen",
       "target": "azhu",
-      "relation": "朋友"
+      "relation": "相识"
     },
     {
       "source": "tangxiaoan",
@@ -615,12 +605,7 @@
     {
       "source": "huangerjie",
       "target": "zhusanjie",
-      "relation": "朋友"
-    },
-    {
-      "source": "luozifu",
-      "target": "laian",
-      "relation": "主仆"
+      "relation": "姐妹"
     },
     {
       "source": "zhaoerbao",
@@ -636,11 +621,6 @@
       "source": "qiyunsou",
       "target": "zhoushuangyu",
       "relation": "相识"
-    },
-    {
-      "source": "qiyunsou",
-      "target": "zhoushuangzhu",
-      "relation": "恩客"
     },
     {
       "source": "wangliansheng",
@@ -669,6 +649,11 @@
     },
     {
       "source": "wangliansheng",
+      "target": "zhoushuangyu",
+      "relation": "恩客"
+    },
+    {
+      "source": "zhushuren",
       "target": "zhoushuangyu",
       "relation": "恩客"
     }
