@@ -290,7 +290,7 @@
     {
       "source": "ajin",
       "target": "adebao",
-      "relation": "情人"
+      "relation": "夫妻"
     },
     {
       "source": "ajin",
@@ -300,12 +300,12 @@
     {
       "source": "ajin",
       "target": "zhoulan",
-      "relation": "鸨母"
+      "relation": "主仆"
     },
     {
       "source": "ajin",
       "target": "zhoushuangzhu",
-      "relation": "生意往来"
+      "relation": "主仆"
     },
     {
       "source": "chenxiaoyun",
