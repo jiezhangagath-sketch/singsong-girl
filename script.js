@@ -287,7 +287,7 @@ function renderRelationshipNetwork(centerId, choice) {
     const baseSize = isCenter ? 55 : dist === 1 ? 42 : dist === 2 ? 34 : 28;
     const size = baseSize + Math.min(degree[n.id] || 0, 8) * 2;
     const opacity = isCenter ? 1.0 : dist === 1 ? 0.95 : dist === 2 ? 0.5 : 0.2;
-    const catIdx = categoryIndex[n.category] || 5;
+    const catIdx = categoryIndex[n.category] !== undefined ? categoryIndex[n.category] : 5;
 
     return {
       id: n.id,
