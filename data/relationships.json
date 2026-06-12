@@ -425,12 +425,12 @@
     {
       "source": "shenxiaohong",
       "target": "ajinda",
-      "relation": "生意往来"
+      "relation": "主仆"
     },
     {
       "source": "shenxiaohong",
       "target": "azhu",
-      "relation": "生意往来"
+      "relation": "主仆"
     },
     {
       "source": "shenxiaohong",
@@ -440,7 +440,7 @@
     {
       "source": "shenxiaohong",
       "target": "zhanghuizhen",
-      "relation": "生意往来"
+      "relation": "情敌"
     },
     {
       "source": "wangliansheng",
@@ -595,7 +595,7 @@
     {
       "source": "shenxiaohong",
       "target": "hongshanqing",
-      "relation": "恩客"
+      "relation": "相识"
     },
     {
       "source": "zhanghuizhen",
