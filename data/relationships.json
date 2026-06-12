@@ -18,7 +18,7 @@
     {
       "id": "lvjiechen",
       "name": "吕杰臣",
-      "category": "other"
+      "category": "client"
     },
     {
       "id": "zhoulan",
@@ -43,7 +43,7 @@
     {
       "id": "xiaoliuer",
       "name": "小柳儿",
-      "category": "courtesan"
+      "category": "other"
     },
     {
       "id": "tumingzhu",
@@ -63,7 +63,7 @@
     {
       "id": "zhangxiaocun",
       "name": "张小村",
-      "category": "other"
+      "category": "client"
     },
     {
       "id": "zhangxiuying",
@@ -93,7 +93,7 @@
     {
       "id": "zhuairen",
       "name": "朱蔼人",
-      "category": "other"
+      "category": "client"
     },
     {
       "id": "lishifu",
@@ -213,17 +213,17 @@
     {
       "id": "azhu",
       "name": "阿珠",
-      "category": "courtesan"
+      "category": "servant"
     },
     {
       "id": "ajin",
       "name": "阿金",
-      "category": "courtesan"
+      "category": "servant"
     },
     {
       "id": "ajinda",
       "name": "阿金大",
-      "category": "courtesan"
+      "category": "servant"
     },
     {
       "id": "luxiubao",
