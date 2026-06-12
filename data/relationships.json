@@ -365,12 +365,7 @@
     {
       "source": "huangcuifeng",
       "target": "shenxiaohong",
-      "relation": "生意往来"
-    },
-    {
-      "source": "huangcuifeng",
-      "target": "zhusanjie",
-      "relation": "生意往来"
+      "relation": "相识"
     },
     {
       "source": "jinqiaozhen",
@@ -656,6 +651,16 @@
       "source": "wangliansheng",
       "target": "zhiner",
       "relation": "亲戚"
+    },
+    {
+      "source": "huangcuifeng",
+      "target": "jinfeng",
+      "relation": "姐妹"
+    },
+    {
+      "source": "huangcuifeng",
+      "target": "zhufeng",
+      "relation": "姐妹"
     }
   ],
   "labels": {
