@@ -310,7 +310,7 @@
     {
       "source": "chenxiaoyun",
       "target": "changfu",
-      "relation": "生意往来"
+      "relation": "主仆"
     },
     {
       "source": "chenxiaoyun",
@@ -320,7 +320,7 @@
     {
       "source": "chenxiaoyun",
       "target": "jinaizhen",
-      "relation": "生意往来"
+      "relation": "相识"
     },
     {
       "source": "chenxiaoyun",
@@ -335,7 +335,7 @@
     {
       "source": "chenxiaoyun",
       "target": "wangliansheng",
-      "relation": "帮闲"
+      "relation": "朋友"
     },
     {
       "source": "chenxiaoyun",
@@ -635,7 +635,7 @@
     {
       "source": "qiyunsou",
       "target": "zhoushuangyu",
-      "relation": "恩客"
+      "relation": "相识"
     },
     {
       "source": "qiyunsou",
@@ -666,6 +666,11 @@
       "source": "kuanger",
       "target": "zhangshou",
       "relation": "朋友"
+    },
+    {
+      "source": "wangliansheng",
+      "target": "zhoushuangyu",
+      "relation": "恩客"
     }
   ],
   "labels": {
