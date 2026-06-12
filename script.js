@@ -246,6 +246,7 @@ function renderRelationshipNetwork(centerId, choice) {
     const r = edge.relation;
     if (r === '生意往来') return '生意往来';
     if (r === '亲戚') return '亲戚';
+    if (r === '帮闲') return '帮闲';
     if (r === '朋友' || r === '赌友') return '朋友';
     if (r === '相识') return '相识';
     if (r === '姐妹') return '\"姐妹\"';

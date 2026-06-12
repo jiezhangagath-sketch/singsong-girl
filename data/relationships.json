@@ -279,6 +279,11 @@
       "id": "ahu",
       "name": "阿虎",
       "category": "servant"
+    },
+    {
+      "id": "zhiner",
+      "name": "侄儿",
+      "category": "other"
     }
   ],
   "edges": [
@@ -330,7 +335,7 @@
     {
       "source": "chenxiaoyun",
       "target": "wangliansheng",
-      "relation": "朋友"
+      "relation": "帮闲"
     },
     {
       "source": "chenxiaoyun",
@@ -445,17 +450,12 @@
     {
       "source": "wangliansheng",
       "target": "hongshanqing",
-      "relation": "生意往来"
-    },
-    {
-      "source": "wangliansheng",
-      "target": "huangerjie",
-      "relation": "朋友"
+      "relation": "帮闲"
     },
     {
       "source": "wangliansheng",
       "target": "luozifu",
-      "relation": "赌友"
+      "relation": "朋友"
     },
     {
       "source": "wangliansheng",
@@ -465,7 +465,7 @@
     {
       "source": "wangliansheng",
       "target": "tangxiaoan",
-      "relation": "生意往来"
+      "relation": "帮闲"
     },
     {
       "source": "wangliansheng",
@@ -485,17 +485,17 @@
     {
       "source": "zhaoerbao",
       "target": "shiruisheng",
-      "relation": "情人"
+      "relation": "恩客"
     },
     {
       "source": "zhaoerbao",
       "target": "shisan",
-      "relation": "情人"
+      "relation": "恩客"
     },
     {
       "source": "zhaoerbao",
       "target": "zhangxiuying",
-      "relation": "生意往来"
+      "relation": "朋友"
     },
     {
       "source": "zhaoerbao",
@@ -585,7 +585,7 @@
     {
       "source": "wangliansheng",
       "target": "azhu",
-      "relation": "朋友"
+      "relation": "相识"
     },
     {
       "source": "zhanghuizhen",
@@ -651,6 +651,11 @@
       "source": "qiyunsou",
       "target": "zhoushuangzhu",
       "relation": "恩客"
+    },
+    {
+      "source": "wangliansheng",
+      "target": "zhiner",
+      "relation": "亲戚"
     }
   ],
   "labels": {
