@@ -375,22 +375,17 @@
     {
       "source": "kuanger",
       "target": "liheting",
-      "relation": "生意往来"
+      "relation": "主仆"
     },
     {
       "source": "kuanger",
       "target": "lishifu",
-      "relation": "生意往来"
+      "relation": "主仆"
     },
     {
       "source": "kuanger",
       "target": "pansan",
       "relation": "情人"
-    },
-    {
-      "source": "kuanger",
-      "target": "tumingzhu",
-      "relation": "生意往来"
     },
     {
       "source": "liheting",
@@ -661,6 +656,16 @@
       "source": "huangcuifeng",
       "target": "zhufeng",
       "relation": "姐妹"
+    },
+    {
+      "source": "kuanger",
+      "target": "changfu",
+      "relation": "朋友"
+    },
+    {
+      "source": "kuanger",
+      "target": "zhangshou",
+      "relation": "朋友"
     }
   ],
   "labels": {
