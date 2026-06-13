@@ -640,10 +640,7 @@ function renderScene() {
       choiceList.innerHTML = "";
       renderProgressVisual();
       saveProgress();
-      playCloudCurtain(() => {
-        renderPostscript(scene);
-        renderChoices(scene.choices);
-      });
+      openCloudPostscript(scene, scene.choices);
       return;
     }
   } else if (ending) {
@@ -727,6 +724,7 @@ function renderScene() {
 
 let postscriptTypingTimer = null;
 let postscriptClickHandler = null;
+let cloudStampClickHandler = null;
 
 function escapeHtml(text) {
   const div = document.createElement("div");
@@ -734,27 +732,228 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-function playCloudCurtain(onClosed) {
+function createCloudParticles() {
+  const container = document.getElementById("cloud-particles");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const count = window.innerWidth < 768 ? 18 : 32;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement("span");
+    p.className = "cloud-particle";
+    const size = 2 + Math.random() * 4;
+    const left = Math.random() * 100;
+    const top = Math.random() * 100;
+    const duration = 4 + Math.random() * 6;
+    const delay = Math.random() * 3;
+    const driftX = -20 + Math.random() * 40;
+    const driftY = -30 + Math.random() * 60;
+
+    p.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      left: ${left}%;
+      top: ${top}%;
+      animation: particleFloat ${duration}s ease-in-out ${delay}s infinite;
+      --drift-x: ${driftX}px;
+      --drift-y: ${driftY}px;
+    `;
+    container.appendChild(p);
+  }
+}
+
+function clearCloudParticles() {
+  const container = document.getElementById("cloud-particles");
+  if (container) container.innerHTML = "";
+}
+
+function openCloudPostscript(scene, choices) {
   const curtain = document.getElementById("cloud-curtain");
+  const appShell = document.querySelector(".app-shell");
   if (!curtain) {
-    onClosed?.();
+    // 回退：在主体区域渲染
+    renderPostscript(scene);
+    renderChoices(choices);
     return;
   }
 
-  curtain.classList.remove("hidden", "opening");
+  createCloudParticles();
+
+  // 1. 淡出主界面
+  appShell?.classList.add("transition-fading");
+
+  // 2. 显示云幕并开始关闭（右下角墨色晕染）
+  curtain.classList.remove("hidden", "opening", "cloud-text-visible");
   curtain.classList.add("closing");
 
+  // 3. 并行加载跋全文，同时保证墨晕动画至少播放 2.2s
+  Promise.all([
+    loadCloudPostscriptContent(scene),
+    new Promise((resolve) => setTimeout(resolve, 2200)),
+  ]).then(([content]) => {
+    renderCloudContent(scene, choices, content);
+    curtain.classList.add("cloud-text-visible");
+  });
+}
+
+async function loadCloudPostscriptContent(scene) {
+  let fullText = "";
+  try {
+    const res = await fetch("postscript.txt?t=" + Date.now());
+    fullText = await res.text();
+  } catch (e) {
+    fullText = scene.source || "";
+  }
+
+  const paragraphs = fullText.trim().split(/\n+/).filter((p) => p.trim());
+  return {
+    paragraphs,
+    note: scene.content || "",
+  };
+}
+
+function renderCloudContent(scene, choices, content) {
+  const cloudInner = document.getElementById("cloud-text-inner");
+  const cloudChoices = document.getElementById("cloud-choices");
+  const scrollHint = document.getElementById("cloud-text-scroll-hint");
+  const stampHint = document.getElementById("cloud-stamp-hint");
+  if (!cloudInner || !cloudChoices) return;
+
+  // 清除旧内容与旧监听
+  cloudInner.innerHTML = "";
+  cloudChoices.innerHTML = "";
+  const oldScrollHandler = cloudInner._cloudScrollHandler;
+  if (oldScrollHandler) cloudInner.removeEventListener("scroll", oldScrollHandler);
+
+  // 标题
+  const titleDiv = document.createElement("div");
+  titleDiv.className = "cloud-text-title";
+  titleDiv.innerText = scene.title || "跋";
+  cloudInner.appendChild(titleDiv);
+
+  // 跋正文（按段落）
+  const bodyDiv = document.createElement("div");
+  bodyDiv.className = "cloud-text-body";
+  content.paragraphs.forEach((p) => {
+    const para = document.createElement("p");
+    para.innerText = p.trim();
+    bodyDiv.appendChild(para);
+  });
+  cloudInner.appendChild(bodyDiv);
+
+  // 署名
+  const sourceDiv = document.createElement("div");
+  sourceDiv.className = "cloud-text-source";
+  sourceDiv.innerText = "—— 花也怜侬";
+  cloudInner.appendChild(sourceDiv);
+
+  // 角色按语（scene.content）
+  if (content.note && content.note.trim()) {
+    const noteDiv = document.createElement("div");
+    noteDiv.className = "cloud-text-note";
+    noteDiv.innerText = content.note.trim();
+    cloudInner.appendChild(noteDiv);
+  }
+
+  // 滚动监听
+  const scrollHandler = () => updateCloudScrollHint();
+  cloudInner._cloudScrollHandler = scrollHandler;
+  cloudInner.addEventListener("scroll", scrollHandler);
+
+  // 滚动提示点击：向下滚动一屏
+  scrollHint.onclick = () => {
+    cloudInner.scrollTo({
+      top: cloudInner.scrollTop + cloudInner.clientHeight * 0.75,
+      behavior: "smooth",
+    });
+  };
+
+  // 印章提示点击：若未到底则滚底，否则聚焦首个按钮
+  stampHint.onclick = () => {
+    const canScroll = cloudInner.scrollHeight > cloudInner.clientHeight + 4;
+    const nearBottom = cloudInner.scrollTop + cloudInner.clientHeight >= cloudInner.scrollHeight - 24;
+    if (canScroll && !nearBottom) {
+      cloudInner.scrollTo({ top: cloudInner.scrollHeight, behavior: "smooth" });
+    } else {
+      cloudChoices.querySelector("button")?.focus();
+    }
+  };
+
+  // 渲染选择按钮
+  choices.forEach((choice) => {
+    const btn = document.createElement("button");
+    btn.className = "cloud-choice-button";
+    btn.innerText = choice.text;
+    btn.addEventListener("click", () => {
+      closeCloudPostscript(() => {
+        if (choice.nextScene === "__BACK__") {
+          goBack();
+        } else {
+          doSelect(choice);
+        }
+      });
+    });
+    cloudChoices.appendChild(btn);
+  });
+
+  // 初始判断是否需要滚动提示
+  requestAnimationFrame(() => updateCloudScrollHint());
+}
+
+function updateCloudScrollHint() {
+  const cloudInner = document.getElementById("cloud-text-inner");
+  const scrollHint = document.getElementById("cloud-text-scroll-hint");
+  if (!cloudInner || !scrollHint) return;
+
+  const canScroll = cloudInner.scrollHeight > cloudInner.clientHeight + 4;
+  const nearBottom = cloudInner.scrollTop + cloudInner.clientHeight >= cloudInner.scrollHeight - 24;
+
+  if (canScroll && !nearBottom) {
+    scrollHint.classList.remove("hidden");
+  } else {
+    scrollHint.classList.add("hidden");
+  }
+}
+
+function closeCloudPostscript(onComplete) {
+  const curtain = document.getElementById("cloud-curtain");
+  const appShell = document.querySelector(".app-shell");
+  if (!curtain) {
+    onComplete?.();
+    return;
+  }
+
+  // 隐藏文字容器
+  curtain.classList.remove("cloud-text-visible");
+
   setTimeout(() => {
-    onClosed?.();
+    curtain.classList.remove("closing");
+    curtain.classList.add("opening");
+
+    // 主界面淡入（以浅色面貌重现，避免与深色跋背景冲突）
+    appShell?.classList.remove("transition-fading", "postscript-phase");
+    appShell?.classList.add("transition-fading-in");
     setTimeout(() => {
-      curtain.classList.remove("closing");
-      curtain.classList.add("opening");
-      setTimeout(() => {
-        curtain.classList.add("hidden");
-        curtain.classList.remove("opening");
-      }, 1400);
-    }, 400);
-  }, 1400);
+      appShell?.classList.remove("transition-fading-in");
+    }, 1200);
+
+    setTimeout(() => {
+      curtain.classList.add("hidden");
+      curtain.classList.remove("opening");
+      clearCloudParticles();
+
+      const cloudInner = document.getElementById("cloud-text-inner");
+      if (cloudInner) {
+        const handler = cloudInner._cloudScrollHandler;
+        if (handler) cloudInner.removeEventListener("scroll", handler);
+        cloudInner.innerHTML = "";
+      }
+      const cloudChoices = document.getElementById("cloud-choices");
+      if (cloudChoices) cloudChoices.innerHTML = "";
+
+      onComplete?.();
+    }, 1500);
+  }, 400);
 }
 
 function renderPostscript(scene) {

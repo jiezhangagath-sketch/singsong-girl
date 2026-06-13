@@ -27,6 +27,28 @@
 body {
   min-height: 100vh;
   padding: 16px 20px;
+  position: relative;
+  background: var(--paper);
+}
+
+/* 页面背景：云纹水波底图，填充留白区域 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("images/background-sm.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 1s ease;
+}
+
+/* 跋阶段隐藏页面背景纹样 */
+body:has(.app-shell.postscript-phase)::before {
+  opacity: 0;
 }
 
 /* ── 主容器 ── */
@@ -40,6 +62,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  box-shadow: 0 4px 48px rgba(60, 50, 40, 0.06);
 }
 
 .app-shell::before {
@@ -1122,7 +1145,7 @@ body {
   margin-bottom: 0;
 }
 
-/* ── 云幕过渡：入梦 ── */
+/* ── 云幕过渡：入梦 / 梦烟 ── */
 .cloud-curtain {
   position: fixed;
   inset: 0;
@@ -1136,69 +1159,767 @@ body {
   display: none;
 }
 
-.cloud-panel {
+/* 中央墨晕：从画面中心向四周扩散 */
+.cloud-ink-blot {
   position: absolute;
-  top: 0;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 20vmax;
+  height: 20vmax;
+  transform: translate(-50%, -50%) scale(0);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(41, 36, 31, 0.95) 0%,
+    rgba(41, 36, 31, 0.75) 35%,
+    rgba(41, 36, 31, 0.35) 60%,
+    transparent 75%
+  );
+  filter: blur(24px);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  will-change: transform, opacity;
+}
+
+.cloud-curtain.closing .cloud-ink-blot {
+  opacity: 1;
+  animation: inkBlotExpand 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.cloud-curtain.opening .cloud-ink-blot {
+  opacity: 0;
+  animation: inkBlotShrink 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes inkBlotExpand {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(12); opacity: 1; }
+}
+
+@keyframes inkBlotShrink {
+  0% { transform: translate(-50%, -50%) scale(12); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+}
+
+/* 雾气层：柔和呼吸 */
+.cloud-mist {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    radial-gradient(ellipse at 25% 45%, rgba(196, 165, 116, 0.16) 0%, transparent 48%),
+    radial-gradient(ellipse at 75% 55%, rgba(180, 155, 120, 0.13) 0%, transparent 52%);
+  filter: blur(36px);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  animation: mistBreathe 5s ease-in-out infinite;
+}
+
+.cloud-curtain.closing .cloud-mist,
+.cloud-curtain.opening .cloud-mist {
+  opacity: 1;
+}
+
+@keyframes mistBreathe {
+  0%, 100% { transform: scale(1) translateY(0); opacity: 0.65; }
+  50% { transform: scale(1.1) translateY(-12px); opacity: 1; }
+}
+
+/* 飘动云带：前后两层速度不同，形成视差 */
+.cloud-drift {
+  position: absolute;
+  left: -25%;
+  z-index: 1;
+  right: -25%;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(130, 112, 88, 0.14);
+  filter: blur(28px);
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.drift-back {
+  top: 12%;
+  animation: driftAcross 14s ease-in-out infinite;
+}
+
+.drift-front {
+  bottom: 18%;
+  height: 160px;
+  background: rgba(150, 130, 102, 0.18);
+  animation: driftAcross 9s ease-in-out infinite reverse;
+}
+
+.cloud-curtain.closing .cloud-drift,
+.cloud-curtain.opening .cloud-drift {
+  opacity: 1;
+}
+
+@keyframes driftAcross {
+  0%, 100% { transform: translateX(-8%) translateY(0) scaleY(1); }
+  50% { transform: translateX(8%) translateY(-18px) scaleY(1.08); }
+}
+
+/* 浮尘/火星粒子 */
+.cloud-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cloud-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(212, 200, 168, 0.55);
+  border-radius: 50%;
+  filter: blur(1.2px);
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.cloud-curtain.closing .cloud-particle,
+.cloud-curtain.opening .cloud-particle {
+  opacity: 1;
+}
+
+@keyframes particleFloat {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.35;
+  }
+  25% {
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(var(--drift-x), var(--drift-y)) scale(1.2);
+    opacity: 0.45;
+  }
+  75% {
+    opacity: 0.6;
+  }
+}
+
+/* ── 右下角墨色晕染：入梦转场 ── */
+.cloud-ink-wash {
+  position: absolute;
   bottom: 0;
-  width: 50vw;
-  background: #29241f;
-  transition: transform 1.4s cubic-bezier(0.45, 0, 0.55, 1);
-  will-change: transform;
-}
-
-.cloud-panel-left {
-  left: 0;
-  transform: translateX(-100%);
-}
-
-.cloud-panel-right {
   right: 0;
-  transform: translateX(100%);
-}
-
-.cloud-edge {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 120px;
+  width: 100%;
   height: 100%;
-  fill: #332b24;
-  opacity: 0.98;
+  z-index: 1;
+  background: radial-gradient(
+    ellipse 120% 100% at 95% 100%,
+    rgba(41, 36, 31, 0.98) 0%,
+    rgba(41, 36, 31, 0.88) 20%,
+    rgba(50, 42, 34, 0.65) 40%,
+    rgba(60, 52, 42, 0.35) 60%,
+    rgba(70, 62, 50, 0.12) 75%,
+    transparent 90%
+  );
+  transform: scale(0.15) translate(20%, 20%);
+  transform-origin: 95% 100%;
+  opacity: 0;
+  transition: none;
+  will-change: transform, opacity;
 }
 
-.cloud-edge-right {
-  right: -118px;
+.cloud-curtain.closing .cloud-ink-wash {
+  animation: inkWashExpand 2.2s cubic-bezier(0.3, 0, 0.2, 1) forwards;
 }
 
-.cloud-edge-left {
-  left: -118px;
-  transform: scaleX(-1);
+@keyframes inkWashExpand {
+  0% { transform: scale(0.15) translate(20%, 20%); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: scale(1.5) translate(0%, 0%); opacity: 1; }
 }
 
-.cloud-curtain.closing .cloud-panel-left {
-  transform: translateX(0%);
+.cloud-curtain.opening .cloud-ink-wash {
+  animation: inkWashFade 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-.cloud-curtain.closing .cloud-panel-right {
-  transform: translateX(0%);
+@keyframes inkWashFade {
+  0% { transform: scale(1.5) translate(0%, 0%); opacity: 1; }
+  100% { transform: scale(0.5) translate(30%, 30%); opacity: 0; }
 }
 
-.cloud-curtain.opening .cloud-panel-left {
-  transform: translateX(-100%);
+/* ── 第20回梦魇插图底图 ── */
+.dream-illustration {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url("images/dream20-clean.jpg");
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1.1);
+  filter: sepia(0.5) blur(14px) brightness(0.18) contrast(0.85);
+  transition: opacity 2.8s ease, filter 2.8s ease, transform 2.8s ease;
+  will-change: transform, opacity, filter;
+  pointer-events: none;
 }
 
-.cloud-curtain.opening .cloud-panel-right {
-  transform: translateX(100%);
+.cloud-curtain.closing .dream-illustration,
+.cloud-curtain.opening .dream-illustration {
+  opacity: 0.32;
+  transform: scale(1);
+  filter: sepia(0.28) blur(5px) brightness(0.42) contrast(1);
+}
+
+.cloud-curtain.opening .dream-illustration {
+  opacity: 0;
+  transform: scale(1.08);
+  filter: sepia(0.5) blur(14px) brightness(0.18) contrast(0.85);
+}
+
+/* ── 真实云纹素材 ── */
+.cloud-image {
+  position: absolute;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0;
+  will-change: transform, opacity, filter;
+}
+
+/* 主云纹：金线勾云，从右下飘入 */
+.cloud-image-main {
+  right: -8%;
+  bottom: -12%;
+  width: min(75vw, 880px);
+  height: min(75vw, 880px);
+  z-index: 4;
+  background-image: url("images/cloud-gold.webp");
+  transform: translate(25%, 25%) scale(0.55) rotate(-8deg);
+  filter: blur(12px) brightness(0.65) sepia(0.2);
+  transition: opacity 2.2s cubic-bezier(0.3, 0, 0.2, 1),
+              transform 2.2s cubic-bezier(0.3, 0, 0.2, 1),
+              filter 2.2s cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+.cloud-curtain.closing .cloud-image-main {
+  opacity: 0.88;
+  transform: translate(0, 0) scale(1) rotate(0deg);
+  filter: blur(0) brightness(0.95) sepia(0.15);
+}
+
+.cloud-curtain.opening .cloud-image-main {
+  opacity: 0;
+  transform: translate(15%, 15%) scale(0.75) rotate(5deg);
+  filter: blur(8px) brightness(0.5) sepia(0.2);
+}
+
+/* 强调云纹：红描边云，调色为古铜金，尺寸较小、位置偏高 */
+.cloud-image-accent {
+  right: 6%;
+  bottom: 28%;
+  width: min(38vw, 460px);
+  height: min(38vw, 460px);
+  z-index: 3;
+  background-image: url("images/cloud-red.webp");
+  transform: translate(20%, 20%) scale(0.45) rotate(12deg);
+  filter: sepia(0.85) hue-rotate(-45deg) brightness(0.7) saturate(0.8) blur(10px);
+  transition: opacity 2.4s cubic-bezier(0.3, 0, 0.2, 1) 0.35s,
+              transform 2.4s cubic-bezier(0.3, 0, 0.2, 1) 0.35s,
+              filter 2.4s cubic-bezier(0.3, 0, 0.2, 1) 0.35s;
+}
+
+.cloud-curtain.closing .cloud-image-accent {
+  opacity: 0.55;
+  transform: translate(0, 0) scale(1) rotate(0deg);
+  filter: sepia(0.85) hue-rotate(-45deg) brightness(0.82) saturate(0.8) blur(0);
+}
+
+.cloud-curtain.opening .cloud-image-accent {
+  opacity: 0;
+  transform: translate(15%, 15%) scale(0.7) rotate(-8deg);
+  filter: sepia(0.85) hue-rotate(-45deg) brightness(0.55) saturate(0.8) blur(8px);
+}
+
+/* 云纹轻微呼吸，避免静态死板 */
+@keyframes cloudImageBreathe {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(-6px, -10px) scale(1.015) rotate(0.5deg); }
+}
+
+.cloud-curtain.closing.cloud-text-visible .cloud-image-main,
+.cloud-curtain.cloud-text-visible .cloud-image-main {
+  animation: cloudImageBreathe 7s ease-in-out infinite;
+}
+
+@keyframes cloudImageDrift {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(5px, -6px) scale(1.02) rotate(-0.5deg); }
+}
+
+.cloud-curtain.closing.cloud-text-visible .cloud-image-accent,
+.cloud-curtain.cloud-text-visible .cloud-image-accent {
+  animation: cloudImageDrift 5s ease-in-out infinite;
+}
+
+/* ── 云朵文字容器：跋文在此呈现 ── */
+.cloud-text-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.92);
+  z-index: 10;
+  width: min(760px, 92vw);
+  max-height: 88vh;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease 0.8s, transform 1.2s ease 0.8s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cloud-curtain.closing .cloud-text-container {
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.cloud-curtain.closing.cloud-text-visible .cloud-text-container,
+.cloud-curtain.cloud-text-visible .cloud-text-container {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+  transition: opacity 1.2s ease 0.8s, transform 1.2s ease 0.8s;
+}
+
+/* ── 云头：主体蓬松区域 ── */
+.cloud-head {
+  position: relative;
+  width: 100%;
+  /* 不规则云形：类似传统如意云 */
+  border-radius: 55% 45% 50% 50% / 45% 55% 50% 50%;
+  border: 1px solid rgba(196, 165, 116, 0.28);
+  background: rgba(36, 31, 26, 0.78);
+  box-shadow:
+    0 0 60px rgba(41, 36, 31, 0.6),
+    inset 0 0 40px rgba(196, 165, 116, 0.04);
+  backdrop-filter: blur(2px);
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 1.4s ease 1.0s, transform 1.4s ease 1.0s;
+}
+
+.cloud-curtain.cloud-text-visible .cloud-head {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 云头上方凸起：左上 */
+.cloud-head::before {
+  content: "";
+  position: absolute;
+  width: 140px;
+  height: 95px;
+  background: rgba(36, 31, 26, 0.78);
+  border: 1px solid rgba(196, 165, 116, 0.24);
+  border-radius: 50% 50% 40% 60% / 60% 40% 50% 50%;
+  top: -35px;
+  left: 18%;
+  z-index: -1;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 1.2s ease 1.2s, transform 1.2s ease 1.2s;
+}
+
+.cloud-curtain.cloud-text-visible .cloud-head::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 云头上方凸起：右上 */
+.cloud-head::after {
+  content: "";
+  position: absolute;
+  width: 130px;
+  height: 85px;
+  background: rgba(36, 31, 26, 0.78);
+  border: 1px solid rgba(196, 165, 116, 0.24);
+  border-radius: 50% 50% 60% 40% / 40% 60% 50% 50%;
+  top: -30px;
+  right: 20%;
+  z-index: -1;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 1.2s ease 1.4s, transform 1.2s ease 1.4s;
+}
+
+.cloud-curtain.cloud-text-visible .cloud-head::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 文字区域：在云头内部 */
+.cloud-text-inner {
+  width: 100%;
+  max-height: 56vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 44px 52px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 1.05rem;
+  line-height: 2.2;
+  color: #e8e0d0;
+  letter-spacing: 0.04em;
+  text-align: justify;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(196, 165, 116, 0.3) transparent;
+}
+
+/* 自定义滚动条 */
+.cloud-text-inner::-webkit-scrollbar {
+  width: 4px;
+}
+
+.cloud-text-inner::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cloud-text-inner::-webkit-scrollbar-thumb {
+  background: rgba(196, 165, 116, 0.3);
+  border-radius: 2px;
+}
+
+/* 云朵文字标题 */
+.cloud-text-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #c4a574;
+  letter-spacing: 0.18em;
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(196, 165, 116, 0.2);
+  font-family: "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif;
+}
+
+/* 云朵文字正文 */
+.cloud-text-body {
+  font-size: 1.02rem;
+  line-height: 2.2;
+  color: #e0d8c8;
+  text-align: justify;
+}
+
+.cloud-text-body p {
+  margin: 0 0 1.2em 0;
+  text-indent: 2em;
+}
+
+.cloud-text-body p:last-child {
+  margin-bottom: 0;
+}
+
+.cloud-text-body p::first-letter {
+  font-size: 1.2em;
+  color: #c4a574;
+}
+
+.cloud-text-source {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px dashed rgba(196, 165, 116, 0.25);
+  font-size: 0.88rem;
+  color: #a09078;
+  text-align: right;
+  letter-spacing: 0.08em;
+}
+
+/* 角色按语 */
+.cloud-text-note {
+  margin-top: 22px;
+  padding: 16px 20px;
+  border-left: 2px solid rgba(196, 165, 116, 0.35);
+  background: rgba(196, 165, 116, 0.06);
+  font-size: 0.92rem;
+  line-height: 1.9;
+  color: #c8bc9c;
+  text-align: justify;
+  font-style: italic;
+}
+
+/* ── 云尾：从右下角卷曲伸入 ── */
+.cloud-tail {
+  position: absolute;
+  bottom: -20px;
+  right: -10px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.tail-segment {
+  position: absolute;
+  background: rgba(45, 38, 30, 0.75);
+  border: 2px solid rgba(196, 165, 116, 0.32);
+  opacity: 0;
+  transition: all 1.0s cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+/* 云尾第一段：靠近右下角的卷曲起点 */
+.tail-s1 {
+  width: 70px;
+  height: 70px;
+  border-radius: 50% 50% 40% 60% / 60% 40% 50% 50%;
+  bottom: 0;
+  right: 0;
+  transform: rotate(30deg) scale(0.6);
+  transition-delay: 0.6s;
+}
+
+/* 云尾第二段：中段卷曲 */
+.tail-s2 {
+  width: 55px;
+  height: 55px;
+  border-radius: 50% 50% 60% 40% / 40% 60% 50% 50%;
+  bottom: 35px;
+  right: 30px;
+  transform: rotate(-20deg) scale(0.6);
+  transition-delay: 0.8s;
+}
+
+/* 云尾第三段：连接云头的末端 */
+.tail-s3 {
+  width: 45px;
+  height: 45px;
+  border-radius: 50% 50% 50% 50% / 50% 50% 40% 60%;
+  bottom: 65px;
+  right: 55px;
+  transform: rotate(45deg) scale(0.6);
+  transition-delay: 1.0s;
+}
+
+.cloud-curtain.cloud-text-visible .tail-segment {
+  opacity: 0.55;
+  transform: rotate(var(--r, 0deg)) scale(1);
+}
+
+.cloud-curtain.cloud-text-visible .tail-s1 {
+  --r: 30deg;
+}
+.cloud-curtain.cloud-text-visible .tail-s2 {
+  --r: -20deg;
+}
+.cloud-curtain.cloud-text-visible .tail-s3 {
+  --r: 45deg;
+}
+
+/* 滚动提示 */
+.cloud-text-scroll-hint {
+  margin-top: 18px;
+  font-size: 0.82rem;
+  color: #a09078;
+  letter-spacing: 0.1em;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 16px;
+  border-radius: 20px;
+  background: rgba(45, 38, 30, 0.4);
+  border: 1px solid rgba(196, 165, 116, 0.12);
+  pointer-events: none;
+}
+
+.cloud-curtain.closing.cloud-text-visible .cloud-text-scroll-hint,
+.cloud-curtain.cloud-text-visible .cloud-text-scroll-hint {
+  opacity: 0.7;
+  transition: opacity 0.8s ease 1.2s;
+  pointer-events: auto;
+}
+
+.cloud-text-scroll-hint.hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.cloud-text-scroll-hint:hover {
+  opacity: 1 !important;
+  background: rgba(45, 38, 30, 0.6);
+  border-color: rgba(196, 165, 116, 0.25);
+}
+
+.scroll-hint-icon {
+  animation: bounceDown 1.5s ease-in-out infinite;
+  font-size: 0.9rem;
+}
+
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+/* 点击继续提示（印章样式） */
+.cloud-stamp-hint {
+  position: absolute;
+  bottom: 24px;
+  right: 32px;
+  z-index: 11;
+  font-size: 0.75rem;
+  color: #c4a574;
+  letter-spacing: 0.15em;
+  padding: 8px 14px;
+  border: 1px solid rgba(196, 165, 116, 0.3);
+  border-radius: 4px;
+  background: rgba(45, 38, 30, 0.5);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.8s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  font-family: "Kaiti SC", "STKaiti", "KaiTi", cursive;
+}
+
+.cloud-curtain.closing.cloud-text-visible .cloud-stamp-hint,
+.cloud-curtain.cloud-text-visible .cloud-stamp-hint {
+  opacity: 0.85;
+  transition: opacity 0.8s ease 1.5s;
+  pointer-events: auto;
+}
+
+.cloud-stamp-hint:hover {
+  opacity: 1 !important;
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(196, 165, 116, 0.2);
+  border-color: rgba(196, 165, 116, 0.5);
+}
+
+/* 云端选择按钮 */
+.cloud-choices {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
+}
+
+.cloud-curtain.cloud-text-visible .cloud-choices {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cloud-choice-button {
+  font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  padding: 10px 28px;
+  background: transparent;
+  border: 1px solid rgba(196, 165, 116, 0.35);
+  color: #d8d0c0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.cloud-choice-button:hover {
+  background: rgba(196, 165, 116, 0.14);
+  border-color: rgba(196, 165, 116, 0.6);
+  color: #f0e8d8;
+  transform: translateY(-2px);
+}
+
+.cloud-choice-button:active {
+  transform: translateY(0);
+}
+
+/* 打字机光标效果（云朵中） */
+.cloud-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  background: rgba(196, 165, 116, 0.6);
+  animation: blinkCursor 1s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 2px;
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* 主容器过渡淡出淡入 */
+.app-shell.transition-fading {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+
+.app-shell.transition-fading-in {
+  opacity: 1;
+  transition: opacity 1.2s ease 0.3s;
 }
 
 @media (max-width: 768px) {
-  .cloud-edge {
-    width: 72px;
+  .cloud-text-container {
+    width: min(760px, 94vw);
+    max-height: 90vh;
   }
-  .cloud-edge-right {
-    right: -70px;
+
+  .cloud-text-inner {
+    max-height: 50vh;
+    padding: 28px 22px;
+    font-size: 0.98rem;
+    line-height: 2.0;
   }
-  .cloud-edge-left {
-    left: -70px;
+
+  .cloud-text-title {
+    font-size: 1.25rem;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+  }
+
+  .cloud-choices {
+    margin-top: 18px;
+    gap: 10px;
+  }
+
+  .cloud-choice-button {
+    padding: 9px 20px;
+    font-size: 0.85rem;
+  }
+
+  .cloud-stamp-hint {
+    bottom: 16px;
+    right: 16px;
+    padding: 6px 10px;
+    font-size: 0.7rem;
+  }
+
+  .dream-illustration {
+    background-position: 65% 30%;
+  }
+
+  .cloud-image-main {
+    right: -20%;
+    bottom: -18%;
+    width: 110vw;
+    height: 110vw;
+    opacity: 0.75;
+  }
+
+  .cloud-image-accent {
+    right: -5%;
+    bottom: 18%;
+    width: 60vw;
+    height: 60vw;
+    opacity: 0.45;
   }
 }

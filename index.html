@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>《海上花》互动体验</title>
-  <link rel="stylesheet" href="style.css?v=52" />
+  <link rel="stylesheet" href="style.css?v=62" />
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
 <body>
@@ -44,67 +44,44 @@
     </div>
   </main>
 
-  <!-- 云幕过渡 -->
+  <!-- 云幕过渡：入梦 / 梦烟 -->
   <div id="cloud-curtain" class="cloud-curtain hidden">
+    <!-- 第20回梦魇插图底图 -->
+    <div class="dream-illustration" id="dream-illustration"></div>
+    
+    <!-- 底层墨晕：从右下角晕染扩散 -->
+    <div class="cloud-ink-wash"></div>
+    <div class="cloud-ink-blot"></div>
     <div class="cloud-mist"></div>
-    <div class="cloud-panel cloud-panel-left">
-      <svg class="cloud-edge cloud-edge-right" viewBox="0 0 200 600" preserveAspectRatio="none">
-        <path d="M120,0 L0,0 L0,600 L120,600 
-                 C150,590 175,575 165,555
-                 C185,535 195,515 175,495
-                 C190,475 200,455 180,435
-                 C195,415 185,395 165,375
-                 C180,355 190,335 170,315
-                 C185,295 195,275 175,255
-                 C190,235 185,215 165,195
-                 C180,175 195,155 175,135
-                 C190,115 200,95 180,75
-                 C195,55 185,35 165,15
-                 C175,5 150,2 120,0 Z" fill="#c9a875" opacity="0.35" />
-        <path d="M120,0 L0,0 L0,600 L120,600 
-                 C140,592 160,580 150,560
-                 C170,540 180,520 165,500
-                 C175,480 185,460 170,440
-                 C180,420 170,400 155,380
-                 C170,360 180,340 165,320
-                 C175,300 185,280 170,260
-                 C180,240 170,220 155,200
-                 C170,180 180,160 165,140
-                 C175,120 185,100 170,80
-                 C180,60 170,40 155,20
-                 C165,8 145,3 120,0 Z" fill="#e0c69a" opacity="0.22" />
-      </svg>
+    <div class="cloud-drift drift-back"></div>
+    <div class="cloud-drift drift-front"></div>
+    <div class="cloud-particles" id="cloud-particles"></div>
+    
+    <!-- 真实云纹素材 -->
+    <div class="cloud-image cloud-image-main" id="cloud-image-main"></div>
+    <div class="cloud-image cloud-image-accent" id="cloud-image-accent"></div>
+    
+    <!-- 云朵文字容器：一朵连贯的卷云 -->
+    <div class="cloud-text-container" id="cloud-text-container">
+      <!-- 云尾：从右下角卷曲伸入 -->
+      <div class="cloud-tail" id="cloud-tail">
+        <div class="tail-segment tail-s1"></div>
+        <div class="tail-segment tail-s2"></div>
+        <div class="tail-segment tail-s3"></div>
+      </div>
+      <!-- 云头：主体蓬松区域 -->
+      <div class="cloud-head" id="cloud-head">
+        <div class="cloud-text-inner" id="cloud-text-inner"></div>
+      </div>
+      <div class="cloud-text-scroll-hint" id="cloud-text-scroll-hint">
+        <span class="scroll-hint-icon">⬇</span>
+        <span class="scroll-hint-text">向下滚动或点击继续</span>
+      </div>
+      <div class="cloud-choices" id="cloud-choices"></div>
     </div>
-    <div class="cloud-panel cloud-panel-right">
-      <svg class="cloud-edge cloud-edge-left" viewBox="0 0 200 600" preserveAspectRatio="none">
-        <path d="M120,0 L0,0 L0,600 L120,600 
-                 C150,590 175,575 165,555
-                 C185,535 195,515 175,495
-                 C190,475 200,455 180,435
-                 C195,415 185,395 165,375
-                 C180,355 190,335 170,315
-                 C185,295 195,275 175,255
-                 C190,235 185,215 165,195
-                 C180,175 195,155 175,135
-                 C190,115 200,95 180,75
-                 C195,55 185,35 165,15
-                 C175,5 150,2 120,0 Z" fill="#c9a875" opacity="0.35" />
-        <path d="M120,0 L0,0 L0,600 L120,600 
-                 C140,592 160,580 150,560
-                 C170,540 180,520 165,500
-                 C175,480 185,460 170,440
-                 C180,420 170,400 155,380
-                 C170,360 180,340 165,320
-                 C175,300 185,280 170,260
-                 C180,240 170,220 155,200
-                 C170,180 180,160 165,140
-                 C175,120 185,100 170,80
-                 C180,60 170,40 155,20
-                 C165,8 145,3 120,0 Z" fill="#e0c69a" opacity="0.22" />
-      </svg>
-    </div>
+    <div class="cloud-stamp-hint" id="cloud-stamp-hint">点击继续</div>
   </div>
 
-  <script src="script.js?v=52"></script>
+  <script src="script.js?v=62"></script>
 </body>
 </html>
