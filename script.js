@@ -769,10 +769,19 @@ function enablePostscriptSourceReveal(scene) {
       sceneContent.innerHTML = "";
       const sourceText = document.createElement("span");
       sourceText.className = "postscript-source-text";
-      sourceText.innerText = scene.source || "";
+      sourceText.innerText = "正在载入跋原文……";
       sceneContent.appendChild(sourceText);
       sceneContent.classList.remove("postscript-source-fading");
       sceneContent.classList.add("postscript-source-shown");
+
+      fetch("《海上花列传》跋.txt?t=" + Date.now())
+        .then((res) => res.text())
+        .then((fullText) => {
+          sourceText.innerText = fullText.trim();
+        })
+        .catch(() => {
+          sourceText.innerText = scene.source || "";
+        });
     }, 600);
   };
 
