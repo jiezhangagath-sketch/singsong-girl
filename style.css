@@ -1145,7 +1145,7 @@ body:has(.app-shell.postscript-phase)::before {
   margin-bottom: 0;
 }
 
-/* ── 梦境过渡：第20回插图 + 跋文 ── */
+/* ── 梦境过渡：线描插图 + 跋文 ── */
 .cloud-curtain {
   position: fixed;
   inset: 0;
@@ -1155,76 +1155,67 @@ body:has(.app-shell.postscript-phase)::before {
   background: #f4f1ea;
 }
 
+.cloud-curtain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("images/background-sm.webp");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.55;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .cloud-curtain.hidden {
   display: none;
 }
 
-/* 氛围底图：模糊延展的插图，填补边距并营造梦境 */
+/* 氛围底图：不再使用，由云纹背景替代 */
 .dream-atmosphere {
-  position: absolute;
-  inset: -8%;
-  z-index: 0;
-  background-image: url("images/dream20-clean.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(28px) brightness(0.88) sepia(0.12);
-  opacity: 0;
-  transform: scale(1.08);
-  transition: opacity 2.6s ease, transform 2.6s ease;
-  pointer-events: none;
+  display: none;
 }
 
-.cloud-curtain.closing .dream-atmosphere {
-  opacity: 0.55;
-  transform: scale(1);
-}
-
-.cloud-curtain.opening .dream-atmosphere {
-  opacity: 0;
-  transform: scale(1.05);
-}
-
-/* 第20回梦魇插图底图：居左完整呈现，含云气与建筑 */
+/* 第20回线描插图：居中，透明背景，浮于云纹之上 */
 .dream-illustration {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background-image: url("images/dream20-clean.jpg");
+  background-image: url("images/dream20-lines.png");
   background-size: contain;
-  background-position: left center;
+  background-position: center;
   background-repeat: no-repeat;
   opacity: 0;
-  transform: scale(1.03);
-  filter: sepia(0.04) brightness(0.99);
+  transform: scale(1.04);
+  filter: sepia(0.1) brightness(0.95);
   transition: opacity 2.4s ease, transform 2.4s ease, filter 2.4s ease;
   will-change: transform, opacity, filter;
   pointer-events: none;
 }
 
 .cloud-curtain.closing .dream-illustration {
-  opacity: 1;
+  opacity: 0.85;
   transform: scale(1);
-  filter: sepia(0) brightness(1);
+  filter: sepia(0.05) brightness(1);
 }
 
 .cloud-curtain.opening .dream-illustration {
   opacity: 0;
   transform: scale(1.02);
-  filter: sepia(0.06) brightness(0.97);
+  filter: sepia(0.12) brightness(0.93);
 }
 
-/* 淡墨晕染层：轻蒙画面四角，让中心留白更突出 */
+/* 淡墨晕染层：轻蒙四角，突出中心 */
 .cloud-ink-wash {
   position: absolute;
   inset: 0;
   z-index: 2;
   background: radial-gradient(
-    ellipse 120% 120% at 50% 40%,
+    ellipse 120% 120% at 50% 45%,
     transparent 0%,
-    transparent 55%,
-    rgba(60, 52, 42, 0.2) 75%,
-    rgba(41, 36, 31, 0.38) 100%
+    transparent 60%,
+    rgba(60, 52, 42, 0.18) 80%,
+    rgba(41, 36, 31, 0.32) 100%
   );
   opacity: 0;
   transition: opacity 2s ease;
@@ -1245,8 +1236,8 @@ body:has(.app-shell.postscript-phase)::before {
   inset: 0;
   z-index: 3;
   background:
-    radial-gradient(ellipse at 25% 30%, rgba(255, 250, 240, 0.14) 0%, transparent 45%),
-    radial-gradient(ellipse at 75% 70%, rgba(255, 250, 240, 0.1) 0%, transparent 50%);
+    radial-gradient(ellipse at 30% 25%, rgba(255, 250, 240, 0.16) 0%, transparent 45%),
+    radial-gradient(ellipse at 70% 75%, rgba(255, 250, 240, 0.12) 0%, transparent 50%);
   opacity: 0;
   transition: opacity 1.8s ease;
   animation: mistBreathe 6s ease-in-out infinite;
@@ -1298,7 +1289,7 @@ body:has(.app-shell.postscript-phase)::before {
 }
 
 .cloud-curtain.closing .dream-cloud {
-  opacity: 0.42;
+  opacity: 0.35;
   transform: translate(0, 0) scale(1) rotate(0deg);
 }
 
@@ -1306,29 +1297,31 @@ body:has(.app-shell.postscript-phase)::before {
   opacity: 0;
 }
 
-/* 跋文面板：放在插图原人物空白处（左上），不与建筑重叠 */
+/* 跋文面板：居中，位于线描插图空白处 */
 .dream-text-panel {
   position: absolute;
-  top: 10vh;
-  left: 10vh;
+  top: 11vh;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 10;
-  width: min(360px, 34vh);
-  max-height: 55vh;
+  width: min(480px, 45vh);
+  max-height: 48vh;
   opacity: 0;
   transition: opacity 1.2s ease 0.7s, transform 1.2s ease 0.7s;
   pointer-events: none;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .cloud-curtain.cloud-text-visible .dream-text-panel {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
   pointer-events: auto;
 }
 
 .dream-text-title {
-  font-size: 1.45rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: #2a2520;
   letter-spacing: 0.2em;
@@ -1336,23 +1329,25 @@ body:has(.app-shell.postscript-phase)::before {
   margin-bottom: 14px;
   padding-bottom: 10px;
   font-family: "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif;
-  text-shadow: 0 1px 0 rgba(255, 250, 240, 0.6);
+  text-shadow: 0 1px 0 rgba(255, 250, 240, 0.7);
 }
 
 .dream-text-inner {
-  max-height: 42vh;
+  max-height: 38vh;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 6px 12px 6px 4px;
+  padding: 14px 18px;
   font-size: 0.98rem;
   line-height: 2.2;
   color: #2a2520;
   letter-spacing: 0.03em;
   text-align: justify;
-  background: rgba(244, 241, 234, 0.35);
-  border-radius: 6px;
+  background: rgba(244, 241, 234, 0.72);
+  border-radius: 8px;
+  backdrop-filter: blur(2px);
+  box-shadow: 0 4px 24px rgba(60, 52, 42, 0.08);
   scrollbar-width: thin;
-  scrollbar-color: rgba(42, 37, 32, 0.22) transparent;
+  scrollbar-color: rgba(42, 37, 32, 0.2) transparent;
 }
 
 .dream-text-inner::-webkit-scrollbar {
@@ -1369,14 +1364,14 @@ body:has(.app-shell.postscript-phase)::before {
 }
 
 .dream-text-body {
-  font-size: 1.0rem;
-  line-height: 2.3;
+  font-size: 0.96rem;
+  line-height: 2.2;
   color: #2a2520;
   text-align: justify;
 }
 
 .dream-text-body p {
-  margin: 0 0 1.1em 0;
+  margin: 0 0 1.05em 0;
   text-indent: 2em;
 }
 
@@ -1385,22 +1380,22 @@ body:has(.app-shell.postscript-phase)::before {
 }
 
 .dream-text-source {
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px dashed rgba(42, 37, 32, 0.18);
-  font-size: 0.88rem;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(42, 37, 32, 0.15);
+  font-size: 0.86rem;
   color: #5a5045;
   text-align: right;
   letter-spacing: 0.08em;
 }
 
 .dream-text-note {
-  margin-top: 18px;
-  padding: 14px 18px;
-  border-left: 2px solid rgba(42, 37, 32, 0.18);
-  background: rgba(244, 241, 234, 0.55);
-  font-size: 0.92rem;
-  line-height: 1.95;
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-left: 2px solid rgba(42, 37, 32, 0.15);
+  background: rgba(255, 253, 248, 0.6);
+  font-size: 0.9rem;
+  line-height: 1.9;
   color: #4a4038;
   text-align: justify;
   font-style: italic;
@@ -1408,8 +1403,8 @@ body:has(.app-shell.postscript-phase)::before {
 
 /* 滚动提示 */
 .dream-text-hint {
-  margin-top: 14px;
-  font-size: 0.78rem;
+  margin-top: 12px;
+  font-size: 0.76rem;
   color: #5a5045;
   letter-spacing: 0.1em;
   opacity: 0;
@@ -1420,10 +1415,9 @@ body:has(.app-shell.postscript-phase)::before {
   cursor: pointer;
   padding: 6px 14px;
   border-radius: 20px;
-  background: rgba(244, 241, 234, 0.55);
-  border: 1px solid rgba(42, 37, 32, 0.1);
+  background: rgba(244, 241, 234, 0.7);
+  border: 1px solid rgba(42, 37, 32, 0.08);
   pointer-events: none;
-  align-self: center;
 }
 
 .cloud-curtain.cloud-text-visible .dream-text-hint {
@@ -1439,8 +1433,8 @@ body:has(.app-shell.postscript-phase)::before {
 
 .dream-text-hint:hover {
   opacity: 1 !important;
-  background: rgba(244, 241, 234, 0.8);
-  border-color: rgba(42, 37, 32, 0.2);
+  background: rgba(255, 253, 248, 0.9);
+  border-color: rgba(42, 37, 32, 0.18);
 }
 
 .dream-text-hint span:first-child {
@@ -1452,25 +1446,25 @@ body:has(.app-shell.postscript-phase)::before {
   50% { transform: translateY(4px); }
 }
 
-/* 选择按钮：放在右下角 */
+/* 选择按钮：居中底部 */
 .dream-choices {
   position: absolute;
-  bottom: 32px;
-  right: 32px;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 11;
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  justify-content: flex-end;
+  justify-content: center;
   opacity: 0;
-  transform: translateY(12px);
   transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
   pointer-events: none;
 }
 
 .cloud-curtain.cloud-text-visible .dream-choices {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
   pointer-events: auto;
 }
 
@@ -1479,22 +1473,22 @@ body:has(.app-shell.postscript-phase)::before {
   font-size: 0.9rem;
   letter-spacing: 0.08em;
   padding: 10px 26px;
-  background: rgba(244, 241, 234, 0.72);
-  border: 1px solid rgba(42, 37, 32, 0.22);
+  background: rgba(244, 241, 234, 0.78);
+  border: 1px solid rgba(42, 37, 32, 0.18);
   color: #2a2520;
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 2px;
   backdrop-filter: blur(2px);
-  box-shadow: 0 2px 12px rgba(42, 37, 32, 0.08);
+  box-shadow: 0 2px 12px rgba(42, 37, 32, 0.06);
 }
 
 .dream-choice-button:hover {
-  background: rgba(255, 253, 248, 0.92);
-  border-color: rgba(42, 37, 32, 0.4);
+  background: rgba(255, 253, 248, 0.95);
+  border-color: rgba(42, 37, 32, 0.35);
   color: #1a1510;
   transform: translateY(-2px);
-  box-shadow: 0 4px 18px rgba(42, 37, 32, 0.12);
+  box-shadow: 0 4px 18px rgba(42, 37, 32, 0.1);
 }
 
 .dream-choice-button:active {
@@ -1515,11 +1509,11 @@ body:has(.app-shell.postscript-phase)::before {
 
 @media (max-width: 768px) {
   .dream-text-panel {
-    top: 6vh;
+    top: 7vh;
     left: 50%;
     transform: translateX(-50%);
     width: min(520px, 88vw);
-    max-height: 46vh;
+    max-height: 40vh;
   }
 
   .cloud-curtain.cloud-text-visible .dream-text-panel {
@@ -1527,23 +1521,27 @@ body:has(.app-shell.postscript-phase)::before {
   }
 
   .dream-text-inner {
-    max-height: 34vh;
-    padding: 6px 10px 6px 2px;
-    font-size: 0.95rem;
+    max-height: 30vh;
+    padding: 12px 14px;
+    font-size: 0.94rem;
     line-height: 2.0;
   }
 
   .dream-text-title {
-    font-size: 1.3rem;
-    margin-bottom: 14px;
-    padding-bottom: 10px;
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
   }
 
   .dream-choices {
     bottom: 16px;
-    right: 16px;
     left: 16px;
-    justify-content: center;
+    right: 16px;
+    transform: translateX(0);
+  }
+
+  .cloud-curtain.cloud-text-visible .dream-choices {
+    transform: translateX(0) translateY(0);
   }
 
   .dream-choice-button {
@@ -1554,12 +1552,12 @@ body:has(.app-shell.postscript-phase)::before {
   .dream-cloud-left {
     width: 60vw;
     height: 60vw;
-    opacity: 0.35;
+    opacity: 0.28;
   }
 
   .dream-cloud-right {
     width: 55vw;
     height: 55vw;
-    opacity: 0.3;
+    opacity: 0.24;
   }
 }
