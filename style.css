@@ -1110,4 +1110,14 @@ body {
   line-height: 2.4;
   color: #d4c8a8;
   letter-spacing: 0.04em;
+  text-align: right;
+}
+
+.postscript-source-text p {
+  margin: 0 0 1.4em 0;
+  text-indent: 0;
+}
+
+.postscript-source-text p:last-child {
+  margin-bottom: 0;
 }

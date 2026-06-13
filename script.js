@@ -715,6 +715,12 @@ function renderScene() {
 let postscriptTypingTimer = null;
 let postscriptClickHandler = null;
 
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.innerText = text;
+  return div.innerHTML;
+}
+
 function renderPostscript(scene) {
   if (postscriptTypingTimer) {
     clearInterval(postscriptTypingTimer);
@@ -767,7 +773,7 @@ function enablePostscriptSourceReveal(scene) {
 
     setTimeout(() => {
       sceneContent.innerHTML = "";
-      const sourceText = document.createElement("span");
+      const sourceText = document.createElement("div");
       sourceText.className = "postscript-source-text";
       sourceText.innerText = "正在载入跋原文……";
       sceneContent.appendChild(sourceText);
@@ -777,10 +783,11 @@ function enablePostscriptSourceReveal(scene) {
       fetch("postscript.txt?t=" + Date.now())
         .then((res) => res.text())
         .then((fullText) => {
-          sourceText.innerText = fullText.trim();
+          const paragraphs = fullText.trim().split(/\n+/).filter((p) => p.trim());
+          sourceText.innerHTML = paragraphs.map((p) => `<p>${escapeHtml(p.trim())}</p>`).join("");
         })
         .catch(() => {
-          sourceText.innerText = scene.source || "";
+          sourceText.innerHTML = `<p>${escapeHtml(scene.source || "")}</p>`;
         });
     }, 600);
   };
