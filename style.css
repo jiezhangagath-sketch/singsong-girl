@@ -1310,9 +1310,9 @@ body:has(.app-shell.postscript-phase)::before {
 .dream-text-panel {
   position: absolute;
   top: 10vh;
-  left: 7vh;
+  left: 10vh;
   z-index: 10;
-  width: min(380px, 38vh);
+  width: min(360px, 34vh);
   max-height: 55vh;
   opacity: 0;
   transition: opacity 1.2s ease 0.7s, transform 1.2s ease 0.7s;
