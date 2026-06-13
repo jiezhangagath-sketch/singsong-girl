@@ -474,6 +474,10 @@ function isEndingScene(sceneId) {
   return sceneId === "ending" || sceneId === "ending_zp" || sceneId === "ending_wl";
 }
 
+function isPostscriptScene(sceneId) {
+  return sceneId.endsWith("_postscript");
+}
+
 function getCharacterPath() {
   if (!selectedCharacter) return [];
   const introScene = getScene(storyData.startScene);
@@ -612,22 +616,42 @@ function renderScene() {
   }
 
   const ending = isEndingScene(currentSceneId);
+  const postscript = isPostscriptScene(currentSceneId);
   const isIntro = currentSceneId === storyData?.startScene;
   const appShell = document.querySelector(".app-shell");
 
   sceneHeader.innerHTML = `<h2>${scene.title}</h2>`;
 
-  if (ending) {
+  if (postscript) {
     appShell?.classList.remove("intro-phase");
-    sceneContent.classList.remove("intro-ink");
+    appShell?.classList.add("postscript-phase");
+    sceneContent.classList.remove("intro-ink", "ending-content");
+    sceneHeader.classList.remove("ending-header");
+    sceneHeader.classList.add("postscript-header");
+    sceneContent.classList.add("postscript-content");
+    choiceList.classList.remove("intro-rise");
+    characterCard.classList.add("hidden");
+    sourcePanel.classList.add("hidden");
+    progressWrap.classList.add("hidden");
+  } else if (ending) {
+    choiceList.style.opacity = "";
+    choiceList.style.pointerEvents = "";
+    choiceList.style.transition = "";
+    appShell?.classList.remove("intro-phase", "postscript-phase");
+    sceneContent.classList.remove("intro-ink", "postscript-content");
+    sceneHeader.classList.remove("postscript-header");
     choiceList.classList.remove("intro-rise");
     sceneContent.classList.add("ending-content");
     sceneHeader.classList.add("ending-header");
     characterCard.classList.add("hidden");
     sourcePanel.classList.add("hidden");
   } else {
-    sceneContent.classList.remove("ending-content");
-    sceneHeader.classList.remove("ending-header");
+    choiceList.style.opacity = "";
+    choiceList.style.pointerEvents = "";
+    choiceList.style.transition = "";
+    appShell?.classList.remove("intro-phase", "postscript-phase");
+    sceneContent.classList.remove("ending-content", "postscript-content");
+    sceneHeader.classList.remove("ending-header", "postscript-header");
     if (selectedCharacter) {
       showCharacterInfo(selectedCharacter);
     } else {
@@ -673,7 +697,11 @@ function renderScene() {
     choiceList.classList.remove("intro-rise");
   }
 
-  sceneContent.innerText = scene.content;
+  if (postscript) {
+    renderPostscript(scene);
+  } else {
+    sceneContent.innerText = scene.content;
+  }
   renderChoices(scene.choices);
 
   if (isIntro) {
@@ -682,6 +710,37 @@ function renderScene() {
 
   renderProgressVisual();
   saveProgress();
+}
+
+let postscriptTypingTimer = null;
+
+function renderPostscript(scene) {
+  if (postscriptTypingTimer) {
+    clearInterval(postscriptTypingTimer);
+    postscriptTypingTimer = null;
+  }
+
+  sceneContent.innerHTML = "";
+  choiceList.style.opacity = "0";
+  choiceList.style.pointerEvents = "none";
+  choiceList.style.transition = "opacity 1.2s ease";
+
+  const text = scene.content || "";
+  const chars = Array.from(text);
+  let i = 0;
+  const speed = 42;
+
+  postscriptTypingTimer = setInterval(() => {
+    if (i >= chars.length) {
+      clearInterval(postscriptTypingTimer);
+      postscriptTypingTimer = null;
+      choiceList.style.opacity = "1";
+      choiceList.style.pointerEvents = "auto";
+      return;
+    }
+    sceneContent.appendChild(document.createTextNode(chars[i]));
+    i++;
+  }, speed);
 }
 
 function showCharacterInfo(characterId) {

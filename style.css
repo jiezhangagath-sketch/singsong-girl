@@ -952,3 +952,109 @@ body {
   font-weight: 700;
   letter-spacing: 0.06em;
 }
+
+/* ── 跋阶段：沉夜墨金 ── */
+.app-shell.postscript-phase {
+  background: linear-gradient(180deg, #1e1b17 0%, #161411 100%);
+  border-color: #3a3530;
+  color: #d8d0c0;
+  transition: background 1.6s ease, border-color 1.6s ease, color 1.2s ease;
+}
+
+.app-shell.postscript-phase::before {
+  border-color: rgba(180, 160, 130, 0.18);
+}
+
+.app-shell.postscript-phase .app-header {
+  opacity: 0.12;
+  filter: grayscale(0.6);
+  transition: opacity 1.4s ease, filter 1.4s ease;
+}
+
+.app-shell.postscript-phase .progress-wrap {
+  display: none;
+}
+
+.app-shell.postscript-phase .content-grid {
+  justify-content: center;
+  width: 100%;
+}
+
+.app-shell.postscript-phase .narrative {
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.scene-header.postscript-header {
+  border-bottom: none;
+  text-align: center;
+  padding: 28px 0 12px;
+}
+
+.scene-header.postscript-header h2 {
+  font-size: 1.5rem;
+  color: #c4a574;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  opacity: 0;
+  animation: postscriptTitleReveal 1.4s ease 0.3s forwards;
+}
+
+@keyframes postscriptTitleReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.scene-content.postscript-content {
+  text-align: center;
+  padding: 32px 8vw;
+  font-size: 1.12rem;
+  line-height: 2.2;
+  color: #e8e0d0;
+  min-height: 180px;
+  opacity: 0;
+  animation: postscriptContentReveal 1.4s ease 0.6s forwards;
+}
+
+@keyframes postscriptContentReveal {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.app-shell.postscript-phase .action-row {
+  opacity: 0.75;
+  transition: opacity 0.8s ease;
+}
+
+.app-shell.postscript-phase .button,
+.app-shell.postscript-phase .choice-button {
+  background: transparent;
+  border-color: #7a6b58;
+  color: #d8d0c0;
+}
+
+.app-shell.postscript-phase .button:hover,
+.app-shell.postscript-phase .choice-button:hover {
+  background: rgba(196, 165, 116, 0.14);
+  border-color: #c4a574;
+  color: #f0e8d8;
+}
+
+.app-shell.postscript-phase .choice-list {
+  justify-items: center;
+}
