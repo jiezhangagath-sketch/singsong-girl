@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>《海上花》互动体验</title>
-  <link rel="stylesheet" href="style.css?v=63" />
+  <link rel="stylesheet" href="style.css?v=64" />
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
 <body>
@@ -44,14 +44,21 @@
     </div>
   </main>
 
-  <!-- 云幕过渡：入梦 / 梦烟 -->
+  <!-- 梦境过渡：第20回插图 + 跋文 -->
   <div id="cloud-curtain" class="cloud-curtain hidden">
+    <!-- 氛围底图：模糊延展的插图，填补边距并营造梦境 -->
+    <div class="dream-atmosphere" id="dream-atmosphere"></div>
+    
     <!-- 第20回梦魇插图底图（人物已删除） -->
     <div class="dream-illustration" id="dream-illustration"></div>
     
     <!-- 淡墨晕染层 -->
     <div class="cloud-ink-wash"></div>
     <div class="cloud-mist"></div>
+    
+    <!-- 云纹边角装饰 -->
+    <div class="dream-cloud dream-cloud-left"></div>
+    <div class="dream-cloud dream-cloud-right"></div>
     
     <!-- 跋文：显示在插图原人物空白处 -->
     <div class="dream-text-panel" id="dream-text-panel">
@@ -67,6 +74,6 @@
     <div class="dream-choices" id="dream-choices"></div>
   </div>
 
-  <script src="script.js?v=63"></script>
+  <script src="script.js?v=64"></script>
 </body>
 </html>

@@ -40,7 +40,7 @@ body::before {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.22;
+  opacity: 0.58;
   pointer-events: none;
   z-index: -1;
   transition: opacity 1s ease;
@@ -1152,26 +1152,52 @@ body:has(.app-shell.postscript-phase)::before {
   z-index: 1000;
   pointer-events: none;
   overflow: hidden;
-  background: #29241f;
+  background: #f4f1ea;
 }
 
 .cloud-curtain.hidden {
   display: none;
 }
 
-/* 第20回梦魇插图底图（人物已删除） */
-.dream-illustration {
+/* 氛围底图：模糊延展的插图，填补边距并营造梦境 */
+.dream-atmosphere {
   position: absolute;
-  inset: 0;
+  inset: -8%;
   z-index: 0;
   background-image: url("images/dream20-clean.jpg");
   background-size: cover;
-  background-position: center top;
+  background-position: center;
   background-repeat: no-repeat;
+  filter: blur(28px) brightness(0.88) sepia(0.12);
   opacity: 0;
   transform: scale(1.08);
-  filter: sepia(0.2) blur(8px) brightness(0.35) contrast(0.9);
-  transition: opacity 2.6s ease, filter 2.6s ease, transform 2.6s ease;
+  transition: opacity 2.6s ease, transform 2.6s ease;
+  pointer-events: none;
+}
+
+.cloud-curtain.closing .dream-atmosphere {
+  opacity: 0.55;
+  transform: scale(1);
+}
+
+.cloud-curtain.opening .dream-atmosphere {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+/* 第20回梦魇插图底图（人物已删除）：完整呈现，含云气与建筑 */
+.dream-illustration {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: url("images/dream20-clean.jpg");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1.03);
+  filter: sepia(0.06) brightness(0.97);
+  transition: opacity 2.4s ease, transform 2.4s ease, filter 2.4s ease;
   will-change: transform, opacity, filter;
   pointer-events: none;
 }
@@ -1179,25 +1205,26 @@ body:has(.app-shell.postscript-phase)::before {
 .cloud-curtain.closing .dream-illustration {
   opacity: 1;
   transform: scale(1);
-  filter: sepia(0.1) blur(0) brightness(1) contrast(1.05);
+  filter: sepia(0) brightness(1);
 }
 
 .cloud-curtain.opening .dream-illustration {
   opacity: 0;
-  transform: scale(1.05);
-  filter: sepia(0.2) blur(8px) brightness(0.35) contrast(0.9);
+  transform: scale(1.02);
+  filter: sepia(0.08) brightness(0.95);
 }
 
-/* 淡墨晕染层：轻蒙画面，让文字可读 */
+/* 淡墨晕染层：轻蒙画面四角，让中心留白更突出 */
 .cloud-ink-wash {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   background: radial-gradient(
-    ellipse 140% 120% at 30% 20%,
-    rgba(41, 36, 31, 0.55) 0%,
-    rgba(41, 36, 31, 0.28) 35%,
-    transparent 70%
+    ellipse 120% 120% at 50% 40%,
+    transparent 0%,
+    transparent 55%,
+    rgba(60, 52, 42, 0.2) 75%,
+    rgba(41, 36, 31, 0.38) 100%
   );
   opacity: 0;
   transition: opacity 2s ease;
@@ -1216,10 +1243,10 @@ body:has(.app-shell.postscript-phase)::before {
 .cloud-mist {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 3;
   background:
-    radial-gradient(ellipse at 20% 30%, rgba(255, 250, 240, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 70%, rgba(255, 250, 240, 0.06) 0%, transparent 55%);
+    radial-gradient(ellipse at 25% 30%, rgba(255, 250, 240, 0.14) 0%, transparent 45%),
+    radial-gradient(ellipse at 75% 70%, rgba(255, 250, 240, 0.1) 0%, transparent 50%);
   opacity: 0;
   transition: opacity 1.8s ease;
   animation: mistBreathe 6s ease-in-out infinite;
@@ -1235,21 +1262,61 @@ body:has(.app-shell.postscript-phase)::before {
 }
 
 @keyframes mistBreathe {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.75; }
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.9; }
 }
 
-/* 跋文面板：放在插图原人物空白处（左上区域） */
+/* 云纹边角装饰 */
+.dream-cloud {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0;
+  transition: opacity 2.2s ease 0.6s, transform 2.2s ease 0.6s;
+  filter: sepia(0.25) brightness(0.92);
+}
+
+.dream-cloud-left {
+  left: -3%;
+  bottom: -4%;
+  width: min(34vw, 420px);
+  height: min(34vw, 420px);
+  background-image: url("images/cloud-gold.webp");
+  transform: translate(-8%, 8%) scale(0.9);
+}
+
+.dream-cloud-right {
+  right: -4%;
+  top: -5%;
+  width: min(30vw, 380px);
+  height: min(30vw, 380px);
+  background-image: url("images/cloud-red.webp");
+  transform: translate(8%, -8%) scale(0.9) rotate(-12deg);
+}
+
+.cloud-curtain.closing .dream-cloud {
+  opacity: 0.42;
+  transform: translate(0, 0) scale(1) rotate(0deg);
+}
+
+.cloud-curtain.opening .dream-cloud {
+  opacity: 0;
+}
+
+/* 跋文面板：放在插图原人物空白处（中上偏左） */
 .dream-text-panel {
   position: absolute;
-  top: 7vh;
-  left: 6vw;
+  top: 15%;
+  left: 50%;
+  transform: translateX(calc(-50% - 6vw));
   z-index: 10;
-  width: min(520px, 42vw);
-  max-height: 86vh;
+  width: min(460px, 32vw);
+  max-height: 82vh;
   opacity: 0;
-  transform: translateY(24px) scale(0.98);
-  transition: opacity 1.2s ease 0.6s, transform 1.2s ease 0.6s;
+  transition: opacity 1.2s ease 0.7s, transform 1.2s ease 0.7s;
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -1257,38 +1324,36 @@ body:has(.app-shell.postscript-phase)::before {
 
 .cloud-curtain.cloud-text-visible .dream-text-panel {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateX(calc(-50% - 6vw)) translateY(0);
   pointer-events: auto;
 }
 
 .dream-text-title {
-  font-size: 1.6rem;
+  font-size: 1.55rem;
   font-weight: 600;
-  color: #f7f2e6;
-  letter-spacing: 0.2em;
-  text-align: left;
+  color: #2a2520;
+  letter-spacing: 0.22em;
+  text-align: center;
   margin-bottom: 18px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 250, 240, 0.2);
   font-family: "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif;
-  text-shadow: 0 2px 12px rgba(41, 36, 31, 0.6);
+  text-shadow: 0 1px 0 rgba(255, 250, 240, 0.6);
 }
 
 .dream-text-inner {
-  max-height: 62vh;
+  max-height: 58vh;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 22px 28px 22px 4px;
-  font-size: 1.05rem;
-  line-height: 2.2;
-  color: #f2ead6;
+  padding: 8px 12px 8px 4px;
+  font-size: 1.02rem;
+  line-height: 2.3;
+  color: #2a2520;
   letter-spacing: 0.04em;
   text-align: justify;
-  background: rgba(41, 36, 31, 0.22);
-  border-radius: 8px;
-  backdrop-filter: blur(1px);
+  background: transparent;
+  border-radius: 4px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 250, 240, 0.25) transparent;
+  scrollbar-color: rgba(42, 37, 32, 0.25) transparent;
 }
 
 .dream-text-inner::-webkit-scrollbar {
@@ -1300,14 +1365,14 @@ body:has(.app-shell.postscript-phase)::before {
 }
 
 .dream-text-inner::-webkit-scrollbar-thumb {
-  background: rgba(255, 250, 240, 0.25);
+  background: rgba(42, 37, 32, 0.2);
   border-radius: 2px;
 }
 
 .dream-text-body {
-  font-size: 1.02rem;
-  line-height: 2.2;
-  color: #f2ead6;
+  font-size: 1.0rem;
+  line-height: 2.3;
+  color: #2a2520;
   text-align: justify;
 }
 
@@ -1323,9 +1388,9 @@ body:has(.app-shell.postscript-phase)::before {
 .dream-text-source {
   margin-top: 18px;
   padding-top: 14px;
-  border-top: 1px dashed rgba(255, 250, 240, 0.2);
+  border-top: 1px dashed rgba(42, 37, 32, 0.18);
   font-size: 0.88rem;
-  color: #d4c8a8;
+  color: #5a5045;
   text-align: right;
   letter-spacing: 0.08em;
 }
@@ -1333,11 +1398,11 @@ body:has(.app-shell.postscript-phase)::before {
 .dream-text-note {
   margin-top: 18px;
   padding: 14px 18px;
-  border-left: 2px solid rgba(255, 250, 240, 0.25);
-  background: rgba(41, 36, 31, 0.3);
+  border-left: 2px solid rgba(42, 37, 32, 0.18);
+  background: rgba(244, 241, 234, 0.55);
   font-size: 0.92rem;
-  line-height: 1.9;
-  color: #e8dcc0;
+  line-height: 1.95;
+  color: #4a4038;
   text-align: justify;
   font-style: italic;
 }
@@ -1345,8 +1410,8 @@ body:has(.app-shell.postscript-phase)::before {
 /* 滚动提示 */
 .dream-text-hint {
   margin-top: 14px;
-  font-size: 0.8rem;
-  color: #d4c8a8;
+  font-size: 0.78rem;
+  color: #5a5045;
   letter-spacing: 0.1em;
   opacity: 0;
   transition: opacity 0.8s ease;
@@ -1356,14 +1421,14 @@ body:has(.app-shell.postscript-phase)::before {
   cursor: pointer;
   padding: 6px 14px;
   border-radius: 20px;
-  background: rgba(41, 36, 31, 0.35);
-  border: 1px solid rgba(255, 250, 240, 0.12);
+  background: rgba(244, 241, 234, 0.55);
+  border: 1px solid rgba(42, 37, 32, 0.1);
   pointer-events: none;
-  align-self: flex-start;
+  align-self: center;
 }
 
 .cloud-curtain.cloud-text-visible .dream-text-hint {
-  opacity: 0.7;
+  opacity: 0.75;
   transition: opacity 0.8s ease 1s;
   pointer-events: auto;
 }
@@ -1375,8 +1440,8 @@ body:has(.app-shell.postscript-phase)::before {
 
 .dream-text-hint:hover {
   opacity: 1 !important;
-  background: rgba(41, 36, 31, 0.5);
-  border-color: rgba(255, 250, 240, 0.25);
+  background: rgba(244, 241, 234, 0.8);
+  border-color: rgba(42, 37, 32, 0.2);
 }
 
 .dream-text-hint span:first-child {
@@ -1415,20 +1480,22 @@ body:has(.app-shell.postscript-phase)::before {
   font-size: 0.9rem;
   letter-spacing: 0.08em;
   padding: 10px 26px;
-  background: rgba(41, 36, 31, 0.45);
-  border: 1px solid rgba(255, 250, 240, 0.3);
-  color: #f2ead6;
+  background: rgba(244, 241, 234, 0.72);
+  border: 1px solid rgba(42, 37, 32, 0.22);
+  color: #2a2520;
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 2px;
   backdrop-filter: blur(2px);
+  box-shadow: 0 2px 12px rgba(42, 37, 32, 0.08);
 }
 
 .dream-choice-button:hover {
-  background: rgba(41, 36, 31, 0.7);
-  border-color: rgba(255, 250, 240, 0.6);
-  color: #fff;
+  background: rgba(255, 253, 248, 0.92);
+  border-color: rgba(42, 37, 32, 0.4);
+  color: #1a1510;
   transform: translateY(-2px);
+  box-shadow: 0 4px 18px rgba(42, 37, 32, 0.12);
 }
 
 .dream-choice-button:active {
@@ -1449,17 +1516,22 @@ body:has(.app-shell.postscript-phase)::before {
 
 @media (max-width: 768px) {
   .dream-text-panel {
-    top: 5vh;
-    left: 5vw;
+    top: 8%;
+    left: 50%;
+    transform: translateX(-50%);
     width: min(520px, 90vw);
     max-height: 78vh;
   }
 
+  .cloud-curtain.cloud-text-visible .dream-text-panel {
+    transform: translateX(-50%) translateY(0);
+  }
+
   .dream-text-inner {
-    max-height: 48vh;
-    padding: 18px 22px 18px 2px;
-    font-size: 0.98rem;
-    line-height: 2.0;
+    max-height: 50vh;
+    padding: 6px 10px 6px 2px;
+    font-size: 0.96rem;
+    line-height: 2.05;
   }
 
   .dream-text-title {
@@ -1480,7 +1552,15 @@ body:has(.app-shell.postscript-phase)::before {
     font-size: 0.85rem;
   }
 
-  .dream-illustration {
-    background-position: 62% top;
+  .dream-cloud-left {
+    width: 60vw;
+    height: 60vw;
+    opacity: 0.35;
+  }
+
+  .dream-cloud-right {
+    width: 55vw;
+    height: 55vw;
+    opacity: 0.3;
   }
 }
