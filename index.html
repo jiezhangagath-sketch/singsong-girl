@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>《海上花》互动体验</title>
-  <link rel="stylesheet" href="style.css?v=50" />
+  <link rel="stylesheet" href="style.css?v=51" />
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
 <body>
@@ -44,6 +44,34 @@
     </div>
   </main>
 
-  <script src="script.js?v=50"></script>
+  <!-- 云幕过渡 -->
+  <div id="cloud-curtain" class="cloud-curtain hidden">
+    <div class="cloud-panel cloud-panel-left">
+      <svg class="cloud-edge cloud-edge-right" viewBox="0 0 200 600" preserveAspectRatio="none">
+        <path d="M120,0 L0,0 L0,600 L120,600 
+                 C160,590 190,560 160,530
+                 C200,500 180,470 150,440
+                 C190,410 170,380 140,350
+                 C180,320 160,290 130,260
+                 C170,230 150,200 120,170
+                 C160,140 140,110 110,80
+                 C150,50 130,20 120,0 Z" />
+      </svg>
+    </div>
+    <div class="cloud-panel cloud-panel-right">
+      <svg class="cloud-edge cloud-edge-left" viewBox="0 0 200 600" preserveAspectRatio="none">
+        <path d="M120,0 L0,0 L0,600 L120,600 
+                 C160,590 190,560 160,530
+                 C200,500 180,470 150,440
+                 C190,410 170,380 140,350
+                 C180,320 160,290 130,260
+                 C170,230 150,200 120,170
+                 C160,140 140,110 110,80
+                 C150,50 130,20 120,0 Z" />
+      </svg>
+    </div>
+  </div>
+
+  <script src="script.js?v=51"></script>
 </body>
 </html>

@@ -955,14 +955,14 @@ body {
 
 /* ── 跋阶段：沉夜墨金 ── */
 .app-shell.postscript-phase {
-  background: linear-gradient(180deg, #1e1b17 0%, #161411 100%);
-  border-color: #3a3530;
-  color: #d8d0c0;
-  transition: background 1.6s ease, border-color 1.6s ease, color 1.2s ease;
+  background: linear-gradient(180deg, #332b24 0%, #29241f 100%);
+  border-color: #4a3f35;
+  color: #e0d5c2;
+  transition: background 1.8s ease, border-color 1.8s ease, color 1.4s ease;
 }
 
 .app-shell.postscript-phase::before {
-  border-color: rgba(180, 160, 130, 0.18);
+  border-color: rgba(180, 160, 130, 0.22);
 }
 
 .app-shell.postscript-phase .app-header {
@@ -1120,4 +1120,85 @@ body {
 
 .postscript-source-text p:last-child {
   margin-bottom: 0;
+}
+
+/* ── 云幕过渡：入梦 ── */
+.cloud-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  overflow: hidden;
+  background: #29241f;
+}
+
+.cloud-curtain.hidden {
+  display: none;
+}
+
+.cloud-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50vw;
+  background: #29241f;
+  transition: transform 1.4s cubic-bezier(0.45, 0, 0.55, 1);
+  will-change: transform;
+}
+
+.cloud-panel-left {
+  left: 0;
+  transform: translateX(-100%);
+}
+
+.cloud-panel-right {
+  right: 0;
+  transform: translateX(100%);
+}
+
+.cloud-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 120px;
+  height: 100%;
+  fill: #332b24;
+  opacity: 0.98;
+}
+
+.cloud-edge-right {
+  right: -118px;
+}
+
+.cloud-edge-left {
+  left: -118px;
+  transform: scaleX(-1);
+}
+
+.cloud-curtain.closing .cloud-panel-left {
+  transform: translateX(0%);
+}
+
+.cloud-curtain.closing .cloud-panel-right {
+  transform: translateX(0%);
+}
+
+.cloud-curtain.opening .cloud-panel-left {
+  transform: translateX(-100%);
+}
+
+.cloud-curtain.opening .cloud-panel-right {
+  transform: translateX(100%);
+}
+
+@media (max-width: 768px) {
+  .cloud-edge {
+    width: 72px;
+  }
+  .cloud-edge-right {
+    right: -70px;
+  }
+  .cloud-edge-left {
+    left: -70px;
+  }
 }

@@ -619,6 +619,7 @@ function renderScene() {
   const postscript = isPostscriptScene(currentSceneId);
   const isIntro = currentSceneId === storyData?.startScene;
   const appShell = document.querySelector(".app-shell");
+  const enteringPostscript = postscript && !appShell?.classList.contains("postscript-phase");
 
   sceneHeader.innerHTML = `<h2>${scene.title}</h2>`;
 
@@ -633,6 +634,18 @@ function renderScene() {
     characterCard.classList.add("hidden");
     sourcePanel.classList.add("hidden");
     progressWrap.classList.add("hidden");
+
+    if (enteringPostscript) {
+      sceneContent.innerHTML = "";
+      choiceList.innerHTML = "";
+      renderProgressVisual();
+      saveProgress();
+      playCloudCurtain(() => {
+        renderPostscript(scene);
+        renderChoices(scene.choices);
+      });
+      return;
+    }
   } else if (ending) {
     choiceList.style.opacity = "";
     choiceList.style.pointerEvents = "";
@@ -719,6 +732,29 @@ function escapeHtml(text) {
   const div = document.createElement("div");
   div.innerText = text;
   return div.innerHTML;
+}
+
+function playCloudCurtain(onClosed) {
+  const curtain = document.getElementById("cloud-curtain");
+  if (!curtain) {
+    onClosed?.();
+    return;
+  }
+
+  curtain.classList.remove("hidden", "opening");
+  curtain.classList.add("closing");
+
+  setTimeout(() => {
+    onClosed?.();
+    setTimeout(() => {
+      curtain.classList.remove("closing");
+      curtain.classList.add("opening");
+      setTimeout(() => {
+        curtain.classList.add("hidden");
+        curtain.classList.remove("opening");
+      }, 1400);
+    }, 400);
+  }, 1400);
 }
 
 function renderPostscript(scene) {
