@@ -774,7 +774,7 @@ function enablePostscriptSourceReveal(scene) {
       sceneContent.classList.remove("postscript-source-fading");
       sceneContent.classList.add("postscript-source-shown");
 
-      fetch("《海上花列传》跋.txt?t=" + Date.now())
+      fetch("postscript.txt?t=" + Date.now())
         .then((res) => res.text())
         .then((fullText) => {
           sourceText.innerText = fullText.trim();
