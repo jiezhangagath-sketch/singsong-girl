@@ -713,14 +713,20 @@ function renderScene() {
 }
 
 let postscriptTypingTimer = null;
+let postscriptClickHandler = null;
 
 function renderPostscript(scene) {
   if (postscriptTypingTimer) {
     clearInterval(postscriptTypingTimer);
     postscriptTypingTimer = null;
   }
+  if (postscriptClickHandler) {
+    sceneContent.removeEventListener("click", postscriptClickHandler);
+    postscriptClickHandler = null;
+  }
 
   sceneContent.innerHTML = "";
+  sceneContent.classList.remove("postscript-source-reveal", "postscript-source-shown");
   choiceList.style.opacity = "0";
   choiceList.style.pointerEvents = "none";
   choiceList.style.transition = "opacity 1.2s ease";
@@ -734,6 +740,7 @@ function renderPostscript(scene) {
     if (i >= chars.length) {
       clearInterval(postscriptTypingTimer);
       postscriptTypingTimer = null;
+      enablePostscriptSourceReveal(scene);
       choiceList.style.opacity = "1";
       choiceList.style.pointerEvents = "auto";
       return;
@@ -741,6 +748,35 @@ function renderPostscript(scene) {
     sceneContent.appendChild(document.createTextNode(chars[i]));
     i++;
   }, speed);
+}
+
+function enablePostscriptSourceReveal(scene) {
+  sceneContent.classList.add("postscript-source-reveal");
+
+  const hint = document.createElement("span");
+  hint.className = "postscript-source-hint";
+  hint.innerText = "点击显示跋原文";
+  sceneContent.appendChild(document.createElement("br"));
+  sceneContent.appendChild(hint);
+
+  postscriptClickHandler = () => {
+    sceneContent.removeEventListener("click", postscriptClickHandler);
+    postscriptClickHandler = null;
+    sceneContent.classList.remove("postscript-source-reveal");
+    sceneContent.classList.add("postscript-source-fading");
+
+    setTimeout(() => {
+      sceneContent.innerHTML = "";
+      const sourceText = document.createElement("span");
+      sourceText.className = "postscript-source-text";
+      sourceText.innerText = scene.source || "";
+      sceneContent.appendChild(sourceText);
+      sceneContent.classList.remove("postscript-source-fading");
+      sceneContent.classList.add("postscript-source-shown");
+    }, 600);
+  };
+
+  sceneContent.addEventListener("click", postscriptClickHandler);
 }
 
 function showCharacterInfo(characterId) {

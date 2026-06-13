@@ -1058,3 +1058,56 @@ body {
 .app-shell.postscript-phase .choice-list {
   justify-items: center;
 }
+
+/* 跋场景：点击显示原文 */
+.scene-content.postscript-source-reveal {
+  cursor: pointer;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.scene-content.postscript-source-reveal:hover {
+  opacity: 0.85;
+  transform: scale(0.995);
+}
+
+.postscript-source-hint {
+  display: inline-block;
+  margin-top: 1.6em;
+  font-size: 0.85rem;
+  color: #a09078;
+  letter-spacing: 0.12em;
+  border-bottom: 1px dashed #7a6b58;
+  padding-bottom: 2px;
+  pointer-events: none;
+}
+
+.scene-content.postscript-source-fading {
+  opacity: 0;
+  filter: blur(3px);
+  transition: opacity 0.6s ease, filter 0.6s ease;
+}
+
+.scene-content.postscript-source-shown {
+  opacity: 0;
+  animation: postscriptSourceReveal 1.2s ease forwards;
+}
+
+@keyframes postscriptSourceReveal {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+.postscript-source-text {
+  font-size: 1.05rem;
+  line-height: 2.4;
+  color: #d4c8a8;
+  letter-spacing: 0.04em;
+}
