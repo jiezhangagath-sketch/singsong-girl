@@ -538,11 +538,6 @@
       "relation": "姐妹"
     },
     {
-      "source": "zhoushuangyu",
-      "target": "zhuanglifang",
-      "relation": "生意往来"
-    },
-    {
       "source": "zhoushuangzhu",
       "target": "zhoulan",
       "relation": "鸨母"
@@ -741,7 +736,7 @@
       "kuanger": "跟踪对象"
     },
     "ajin|zhoushuangzhu": {
-      "ajin": "服侍的倌人"
+      "ajin": "打工的倌人"
     },
     "adebao|ajin": {
       "ajin": "丈夫"

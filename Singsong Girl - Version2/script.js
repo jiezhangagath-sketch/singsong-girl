@@ -8,6 +8,7 @@ const sceneHeader = document.getElementById("scene-header");
 const characterCard = document.getElementById("character-card");
 const sceneContent = document.getElementById("scene-content");
 const choiceList = document.getElementById("choice-list");
+const trapFeedback = document.getElementById("trap-feedback");
 const sourcePanel = document.getElementById("source-panel");
 const sourceContent = document.getElementById("source-content");
 const sourceText = document.getElementById("source-text");
@@ -115,12 +116,6 @@ async function loadStory() {
       data = await loadStoryViaXHR(storyPath + "?t=" + Date.now());
     }
     storyData = data;
-    try {
-      const relResponse = await fetch("data/relationships.json?t=" + Date.now());
-      window.relationshipData = await relResponse.json();
-    } catch (e) {
-      window.relationshipData = null;
-    }
     const hasProgress = loadProgress();
     if (!hasProgress) {
       resetGame();
@@ -172,310 +167,12 @@ function resetGame() {
   renderScene();
 }
 
-function renderRelationshipNetwork(centerId, choice) {
-  const nodes = window.relationshipData?.nodes || [];
-  const edges = window.relationshipData?.edges || [];
-
-  const centerNode = nodes.find(n => n.id === centerId);
-  if (!centerNode) {
-    if (choice) enterStory(choice);
-    return;
-  }
-
-  choiceList.innerHTML = "";
-  choiceList.classList.remove("character-select-grid");
-
-  const container = document.createElement("div");
-  container.className = "relationship-network-container";
-  container.style.width = "100%";
-  container.style.maxWidth = "900px";
-
-  const title = document.createElement("h3");
-  title.className = "network-title";
-  title.innerText = centerNode.name + "的人物关系网";
-  container.appendChild(title);
-
-  // ECharts 容器
-  const chartDiv = document.createElement("div");
-  chartDiv.style.width = "100%";
-  chartDiv.style.height = "600px";
-  container.appendChild(chartDiv);
-
-  // 计算每个节点的连接数（degree）
-  const degree = {};
-  nodes.forEach(n => degree[n.id] = 0);
-  edges.forEach(e => {
-    degree[e.source] = (degree[e.source] || 0) + 1;
-    degree[e.target] = (degree[e.target] || 0) + 1;
-  });
-
-  // BFS 计算距离（以 centerId 为中心）
-  const distances = {};
-  nodes.forEach(n => distances[n.id] = Infinity);
-  distances[centerId] = 0;
-  const queue = [centerId];
-  let head = 0;
-  while (head < queue.length) {
-    const cur = queue[head++];
-    edges.forEach(e => {
-      if (e.source === cur && distances[e.target] === Infinity) {
-        distances[e.target] = distances[cur] + 1;
-        queue.push(e.target);
-      } else if (e.target === cur && distances[e.source] === Infinity) {
-        distances[e.source] = distances[cur] + 1;
-        queue.push(e.source);
-      }
-    });
-  }
-
-  // 类别配置
-  const categories = [
-    { name: '倌人', itemStyle: { color: '#c23531' } },
-    { name: '嫖客', itemStyle: { color: '#2f4554' } },
-    { name: '老鸨', itemStyle: { color: '#d48265' } },
-    { name: '仆人', itemStyle: { color: '#91c7ae' } },
-    { name: '其他', itemStyle: { color: '#bda29a' } }
-  ];
-
-  const categoryNames = ['courtesan', 'client', 'madam', 'servant', 'other'];
-  const categoryIndex = {};
-  categoryNames.forEach((name, i) => categoryIndex[name] = i);
-
-  // 统一关系词
-  function getRelationLabel(edge, fromCenter) {
-    const r = edge.relation;
-    if (r === '生意往来') return '生意往来';
-    if (r === '亲戚') return '亲戚';
-    if (r === '帮闲') return '帮闲';
-    if (r === '朋友' || r === '赌友') return '朋友';
-    if (r === '相识') return '相识';
-    if (r === '姐妹') return '\"姐妹\"';
-    if (r === '恩客') {
-      return fromCenter === edge.source ? '恩客' : '相好';
-    }
-    if (r === '相好') {
-      return fromCenter === edge.source ? '相好' : '恩客';
-    }
-    if (r === '情人') return '朋友';
-    if (r === '鸨母') {
-      return fromCenter === edge.source ? '鸨母' : '手下';
-    }
-    if (r === '主仆') {
-      return fromCenter === edge.source ? '主仆' : '打工';
-    }
-    return r;
-  }
-
-  // 连线颜色映射
-  function getEdgeColor(relation) {
-    if (relation === '恩客' || relation === '相好') return '#c23531';
-    if (relation === '亲戚') return '#8B4513';
-    if (relation === '主仆' || relation === '打工') return '#2f4554';
-    if (relation === '鸨母') return '#d48265';
-    return '#999999';
-  }
-
-  function getEdgeType(relation) {
-    if (relation === '主仆' || relation === '打工') return 'dashed';
-    return 'solid';
-  }
-
-  // 构建 ECharts 节点数据
-  const graphNodes = nodes.map(n => {
-    const dist = distances[n.id] === Infinity ? 99 : distances[n.id];
-    const isCenter = n.id === centerId;
-    const baseSize = isCenter ? 55 : dist === 1 ? 42 : dist === 2 ? 34 : 28;
-    const size = baseSize + Math.min(degree[n.id] || 0, 8) * 2;
-    const opacity = isCenter ? 1.0 : dist === 1 ? 0.95 : dist === 2 ? 0.5 : 0.2;
-    const catIdx = categoryIndex[n.category] !== undefined ? categoryIndex[n.category] : 5;
-
-    return {
-      id: n.id,
-      name: n.name,
-      value: degree[n.id] || 0,
-      category: catIdx,
-      symbolSize: size,
-      itemStyle: {
-        opacity: opacity,
-        borderColor: isCenter ? '#fff' : 'transparent',
-        borderWidth: isCenter ? 3 : 0,
-        shadowBlur: isCenter ? 20 : 0,
-        shadowColor: isCenter ? 'rgba(194, 53, 49, 0.4)' : 'transparent'
-      },
-      label: {
-        show: true,
-        fontSize: isCenter ? 15 : dist === 1 ? 13 : dist === 2 ? 12 : 10,
-        fontWeight: isCenter ? 700 : 500,
-        color: isCenter ? '#fff' : (catIdx === 0 || catIdx === 1) ? '#fff' : '#333'
-      },
-      _dist: dist,
-      _isCenter: isCenter
-    };
-  }).filter(n => n._dist <= 3 || n._isCenter);
-
-  const visibleNodeIds = new Set(graphNodes.map(n => n.id));
-
-  // 构建 ECharts 连线数据
-  const graphEdges = edges.map(e => {
-    const label = getRelationLabel(e, centerId);
-    const isCenterEdge = e.source === centerId || e.target === centerId;
-    const p1 = graphNodes.find(n => n.id === e.source);
-    const p2 = graphNodes.find(n => n.id === e.target);
-    if (!p1 || !p2) return null;
-
-    const avgOpacity = (p1.itemStyle.opacity + p2.itemStyle.opacity) / 2;
-    return {
-      source: e.source,
-      target: e.target,
-      value: label,
-      lineStyle: {
-        color: getEdgeColor(e.relation),
-        type: getEdgeType(e.relation),
-        width: isCenterEdge ? 2 : 1,
-        opacity: isCenterEdge ? Math.max(0.4, avgOpacity * 0.8) : avgOpacity * 0.4,
-        curveness: 0.15
-      },
-      label: {
-        show: avgOpacity > 0.4,
-        formatter: label,
-        fontSize: 10,
-        color: '#666'
-      }
-    };
-  }).filter(e => e !== null);
-
-  choiceList.appendChild(container);
-
-  // 初始化 ECharts（必须在容器插入 DOM 之后）
-  const chart = echarts.init(chartDiv);
-
-  const option = {
-    tooltip: {
-      trigger: 'item',
-      formatter: function(params) {
-        if (params.dataType === 'node') {
-          const catName = categories[params.data.category]?.name || '其他';
-          return `<b>${params.name}</b><br/>类别：${catName}`;
-        }
-        return `${params.data.value}`;
-      }
-    },
-    legend: {
-      data: categories.map(c => c.name),
-      top: 10,
-      left: 10,
-      textStyle: { fontSize: 12, color: '#666' }
-    },
-    series: [{
-      type: 'graph',
-      layout: 'force',
-      roam: true,  // 支持缩放/平移
-      draggable: true,
-      data: graphNodes,
-      links: graphEdges,
-      categories: categories,
-      focusNodeAdjacency: true,
-      force: {
-        repulsion: 1200,
-        gravity: 0.05,
-        edgeLength: [100, 250],
-        layoutAnimation: true
-      },
-      edgeSymbol: ['none', 'none'],
-      label: {
-        show: true,
-        position: 'inside',
-        formatter: '{b}'
-      },
-      emphasis: {
-        focus: 'adjacency',
-        lineStyle: {
-          width: 3
-        }
-      },
-      lineStyle: {
-        curveness: 0.15
-      }
-    }]
-  };
-
-  chart.setOption(option);
-
-  // 限制缩放范围（防止过度缩小）
-  const MIN_ZOOM = 0.6;
-  const MAX_ZOOM = 2.5;
-  chart.getZr().on('mousewheel', function() {
-    setTimeout(function() {
-      const opt = chart.getOption();
-      const zoom = (opt.series && opt.series[0] && opt.series[0].zoom) || 1;
-      if (zoom < MIN_ZOOM) {
-        chart.setOption({ series: [{ zoom: MIN_ZOOM }] });
-      } else if (zoom > MAX_ZOOM) {
-        chart.setOption({ series: [{ zoom: MAX_ZOOM }] });
-      }
-    }, 10);
-  });
-
-  // 点击节点切换中心
-  chart.on('click', function(params) {
-    if (params.dataType === 'node') {
-      const clickedId = params.data.id;
-      if (clickedId !== centerId) {
-        const introScene = storyData.scenes.find(s => s.id === storyData.startScene);
-        const nextChoice = introScene?.choices?.find(c => c.character === clickedId);
-        renderRelationshipNetwork(clickedId, nextChoice);
-      }
-    }
-  });
-
-  // 响应窗口大小变化
-  window.addEventListener('resize', function() {
-    chart.resize();
-  });
-
-  // 按钮行
-  const btnRow = document.createElement("div");
-  btnRow.className = "network-btn-row";
-
-  const backBtn = document.createElement("button");
-  backBtn.className = "button button-secondary";
-  backBtn.innerText = "返回选择";
-  backBtn.addEventListener("click", () => renderScene());
-
-  const enterBtn = document.createElement("button");
-  if (choice) {
-    enterBtn.className = "button button-primary";
-    enterBtn.innerText = "进入剧情";
-    enterBtn.addEventListener("click", () => enterStory(choice));
-  } else {
-    enterBtn.className = "button button-secondary";
-    enterBtn.innerText = "该角色暂无剧情";
-    enterBtn.disabled = true;
-    enterBtn.style.opacity = "0.6";
-  }
-
-  btnRow.appendChild(backBtn);
-  btnRow.appendChild(enterBtn);
-  container.appendChild(btnRow);
-}
-function enterStory(choice) {
-  const appShell = document.querySelector(".app-shell");
-  appShell?.classList.remove("intro-phase");
-  setTimeout(() => {
-    doSelect(choice);
-  }, 650);
-}
-
 function getScene(sceneId) {
   return storyData.scenes.find((scene) => scene.id === sceneId);
 }
 
 function isEndingScene(sceneId) {
   return sceneId === "ending" || sceneId === "ending_zp" || sceneId === "ending_wl";
-}
-
-function isPostscriptScene(sceneId) {
-  return sceneId.endsWith("_postscript");
 }
 
 function getCharacterPath() {
@@ -616,55 +313,22 @@ function renderScene() {
   }
 
   const ending = isEndingScene(currentSceneId);
-  const postscript = isPostscriptScene(currentSceneId);
   const isIntro = currentSceneId === storyData?.startScene;
   const appShell = document.querySelector(".app-shell");
-  const enteringPostscript = postscript && !appShell?.classList.contains("postscript-phase");
 
   sceneHeader.innerHTML = `<h2>${scene.title}</h2>`;
 
-  if (postscript) {
+  if (ending) {
     appShell?.classList.remove("intro-phase");
-    appShell?.classList.add("postscript-phase");
-    sceneContent.classList.remove("intro-ink", "ending-content");
-    sceneHeader.classList.remove("ending-header");
-    sceneHeader.classList.add("postscript-header");
-    sceneContent.classList.add("postscript-content");
-    choiceList.classList.remove("intro-rise");
-    characterCard.classList.add("hidden");
-    sourcePanel.classList.add("hidden");
-    progressWrap.classList.add("hidden");
-
-    if (enteringPostscript) {
-      sceneContent.innerHTML = "";
-      choiceList.innerHTML = "";
-      renderProgressVisual();
-      saveProgress();
-      playCloudCurtain(() => {
-        renderPostscript(scene);
-        renderChoices(scene.choices);
-      });
-      return;
-    }
-  } else if (ending) {
-    choiceList.style.opacity = "";
-    choiceList.style.pointerEvents = "";
-    choiceList.style.transition = "";
-    appShell?.classList.remove("intro-phase", "postscript-phase");
-    sceneContent.classList.remove("intro-ink", "postscript-content");
-    sceneHeader.classList.remove("postscript-header");
+    sceneContent.classList.remove("intro-ink");
     choiceList.classList.remove("intro-rise");
     sceneContent.classList.add("ending-content");
     sceneHeader.classList.add("ending-header");
     characterCard.classList.add("hidden");
     sourcePanel.classList.add("hidden");
   } else {
-    choiceList.style.opacity = "";
-    choiceList.style.pointerEvents = "";
-    choiceList.style.transition = "";
-    appShell?.classList.remove("intro-phase", "postscript-phase");
-    sceneContent.classList.remove("ending-content", "postscript-content");
-    sceneHeader.classList.remove("ending-header", "postscript-header");
+    sceneContent.classList.remove("ending-content");
+    sceneHeader.classList.remove("ending-header");
     if (selectedCharacter) {
       showCharacterInfo(selectedCharacter);
     } else {
@@ -710,11 +374,9 @@ function renderScene() {
     choiceList.classList.remove("intro-rise");
   }
 
-  if (postscript) {
-    renderPostscript(scene);
-  } else {
-    sceneContent.innerText = scene.content;
-  }
+  sceneContent.innerText = scene.content;
+  trapFeedback.classList.add("hidden");
+  trapFeedback.innerHTML = "";
   renderChoices(scene.choices);
 
   if (isIntro) {
@@ -723,117 +385,6 @@ function renderScene() {
 
   renderProgressVisual();
   saveProgress();
-}
-
-let postscriptTypingTimer = null;
-let postscriptClickHandler = null;
-
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.innerText = text;
-  return div.innerHTML;
-}
-
-function playCloudCurtain(onClosed) {
-  const curtain = document.getElementById("cloud-curtain");
-  if (!curtain) {
-    onClosed?.();
-    return;
-  }
-
-  curtain.classList.remove("hidden", "opening");
-  curtain.classList.add("closing");
-
-  setTimeout(() => {
-    onClosed?.();
-    setTimeout(() => {
-      curtain.classList.remove("closing");
-      curtain.classList.add("opening");
-      setTimeout(() => {
-        curtain.classList.add("hidden");
-        curtain.classList.remove("opening");
-      }, 1400);
-    }, 400);
-  }, 1400);
-}
-
-function renderPostscript(scene) {
-  if (postscriptTypingTimer) {
-    clearInterval(postscriptTypingTimer);
-    postscriptTypingTimer = null;
-  }
-  if (postscriptClickHandler) {
-    sceneContent.removeEventListener("click", postscriptClickHandler);
-    postscriptClickHandler = null;
-  }
-
-  sceneContent.innerHTML = "";
-  sceneContent.classList.remove("postscript-source-reveal", "postscript-source-shown");
-  choiceList.style.opacity = "0";
-  choiceList.style.pointerEvents = "none";
-  choiceList.style.transition = "opacity 1.2s ease";
-
-  const text = scene.content || "";
-  const chars = Array.from(text);
-  let i = 0;
-  const speed = 42;
-
-  postscriptTypingTimer = setInterval(() => {
-    if (i >= chars.length) {
-      clearInterval(postscriptTypingTimer);
-      postscriptTypingTimer = null;
-      enablePostscriptSourceReveal(scene);
-      choiceList.style.opacity = "1";
-      choiceList.style.pointerEvents = "auto";
-      return;
-    }
-    sceneContent.appendChild(document.createTextNode(chars[i]));
-    i++;
-  }, speed);
-}
-
-function enablePostscriptSourceReveal(scene) {
-  sceneContent.classList.add("postscript-source-reveal");
-
-  const hint = document.createElement("span");
-  hint.className = "postscript-source-hint";
-  hint.innerText = "点击显示跋原文";
-  sceneContent.appendChild(document.createElement("br"));
-  sceneContent.appendChild(hint);
-
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get("autoreveal") === "1") {
-    setTimeout(() => sceneContent.click(), 1800);
-  }
-
-  postscriptClickHandler = () => {
-    sceneContent.removeEventListener("click", postscriptClickHandler);
-    postscriptClickHandler = null;
-    sceneContent.classList.remove("postscript-source-reveal");
-    sceneContent.classList.add("postscript-source-fading");
-
-    setTimeout(() => {
-      sceneContent.innerHTML = "";
-      const sourceText = document.createElement("div");
-      sourceText.className = "postscript-source-text";
-      sourceText.innerText = "正在载入跋原文……";
-      sceneContent.appendChild(sourceText);
-      sceneContent.classList.remove("postscript-source-fading");
-      sceneContent.classList.add("postscript-source-shown");
-
-      fetch("postscript.txt?t=" + Date.now())
-        .then((res) => res.text())
-        .then((fullText) => {
-          const paragraphs = fullText.trim().split(/\n+/).filter((p) => p.trim());
-          sourceText.innerHTML = paragraphs.map((p) => `<p>${escapeHtml(p.trim())}</p>`).join("");
-        })
-        .catch(() => {
-          sourceText.innerHTML = `<p>${escapeHtml(scene.source || "")}</p>`;
-        });
-    }, 600);
-  };
-
-  sceneContent.addEventListener("click", postscriptClickHandler);
 }
 
 function showCharacterInfo(characterId) {
@@ -985,9 +536,25 @@ function renderChoices(choices) {
     const button = document.createElement("button");
     button.className = "choice-button";
     button.innerText = choice.text;
-    button.addEventListener("click", () => selectChoice(choice));
+    button.addEventListener("click", () => selectChoice(choice, button));
     choiceList.appendChild(button);
   });
+}
+
+function showTrapFeedback(choice, button) {
+  button.classList.add("is-wrong");
+  button.classList.remove("is-shaking");
+  void button.offsetWidth; // reflow，确保动画可重新触发
+  button.classList.add("is-shaking");
+
+  trapFeedback.innerHTML = `
+    <div class="trap-feedback-mark">朱批 · 此路不通</div>
+    <p class="trap-feedback-text">${choice.explanation || "此处理解有误，请细读原文与解读，另择去路。"}</p>
+  `;
+  trapFeedback.classList.remove("hidden");
+  trapFeedback.style.animation = "none";
+  void trapFeedback.offsetHeight;
+  trapFeedback.style.animation = "";
 }
 
 function doSelect(choice) {
@@ -1003,19 +570,36 @@ function doSelect(choice) {
   renderScene();
 }
 
-function selectChoice(choice) {
+function selectChoice(choice, button) {
+  if (choice.trap) {
+    showTrapFeedback(choice, button);
+    return;
+  }
+
   if (choice.nextScene === "__BACK__") {
     goBack();
     return;
   }
 
   const isIntro = currentSceneId === storyData?.startScene;
-  if (isIntro && choice.character) {
-    renderRelationshipNetwork(choice.character, choice);
-    return;
-  }
   if (isIntro) {
-    enterStory(choice);
+    // 退出序幕：先移除暗化，等过渡完成再跳转
+    const appShell = document.querySelector(".app-shell");
+    appShell?.classList.remove("intro-phase");
+    // 给选中的卡片加一个瞬时高亮反馈
+    const cards = choiceList.querySelectorAll(".character-select-card");
+    cards.forEach((card) => {
+      if (card.contains(document.activeElement) || card === document.activeElement) {
+        card.style.transform = "scale(1.06)";
+        card.style.borderColor = "var(--accent)";
+      } else {
+        card.style.opacity = "0.3";
+        card.style.filter = "grayscale(0.6)";
+      }
+    });
+    setTimeout(() => {
+      doSelect(choice);
+    }, 650);
     return;
   }
 

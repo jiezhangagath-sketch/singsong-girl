@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test Postscript</title>
+</head>
+<body>
+  <script>
+    localStorage.setItem('haishanghua_progress', JSON.stringify({
+      currentSceneId: 'xh_postscript',
+      selectedCharacter: 'wl',
+      history: []
+    }));
+    const params = new URLSearchParams(location.search);
+    const extra = params.get('autoreveal') === '1' ? '?autoreveal=1' : '';
+    location.href = 'http://localhost:8080/' + extra;
+  </script>
+</body>
+</html>
