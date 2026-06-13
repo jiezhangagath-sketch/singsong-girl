@@ -732,41 +732,6 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-function createCloudParticles() {
-  const container = document.getElementById("cloud-particles");
-  if (!container) return;
-  container.innerHTML = "";
-
-  const count = window.innerWidth < 768 ? 18 : 32;
-  for (let i = 0; i < count; i++) {
-    const p = document.createElement("span");
-    p.className = "cloud-particle";
-    const size = 2 + Math.random() * 4;
-    const left = Math.random() * 100;
-    const top = Math.random() * 100;
-    const duration = 4 + Math.random() * 6;
-    const delay = Math.random() * 3;
-    const driftX = -20 + Math.random() * 40;
-    const driftY = -30 + Math.random() * 60;
-
-    p.style.cssText = `
-      width: ${size}px;
-      height: ${size}px;
-      left: ${left}%;
-      top: ${top}%;
-      animation: particleFloat ${duration}s ease-in-out ${delay}s infinite;
-      --drift-x: ${driftX}px;
-      --drift-y: ${driftY}px;
-    `;
-    container.appendChild(p);
-  }
-}
-
-function clearCloudParticles() {
-  const container = document.getElementById("cloud-particles");
-  if (container) container.innerHTML = "";
-}
-
 function openCloudPostscript(scene, choices) {
   const curtain = document.getElementById("cloud-curtain");
   const appShell = document.querySelector(".app-shell");
@@ -776,8 +741,6 @@ function openCloudPostscript(scene, choices) {
     renderChoices(choices);
     return;
   }
-
-  createCloudParticles();
 
   // 1. 淡出主界面
   appShell?.classList.add("transition-fading");
@@ -813,76 +776,66 @@ async function loadCloudPostscriptContent(scene) {
 }
 
 function renderCloudContent(scene, choices, content) {
-  const cloudInner = document.getElementById("cloud-text-inner");
-  const cloudChoices = document.getElementById("cloud-choices");
-  const scrollHint = document.getElementById("cloud-text-scroll-hint");
-  const stampHint = document.getElementById("cloud-stamp-hint");
-  if (!cloudInner || !cloudChoices) return;
+  const dreamInner = document.getElementById("dream-text-inner");
+  const dreamChoices = document.getElementById("dream-choices");
+  const scrollHint = document.getElementById("dream-text-hint");
+  if (!dreamInner || !dreamChoices) return;
 
   // 清除旧内容与旧监听
-  cloudInner.innerHTML = "";
-  cloudChoices.innerHTML = "";
-  const oldScrollHandler = cloudInner._cloudScrollHandler;
-  if (oldScrollHandler) cloudInner.removeEventListener("scroll", oldScrollHandler);
+  dreamInner.innerHTML = "";
+  dreamChoices.innerHTML = "";
+  const oldScrollHandler = dreamInner._dreamScrollHandler;
+  if (oldScrollHandler) dreamInner.removeEventListener("scroll", oldScrollHandler);
 
   // 标题
   const titleDiv = document.createElement("div");
-  titleDiv.className = "cloud-text-title";
+  titleDiv.className = "dream-text-title";
   titleDiv.innerText = scene.title || "跋";
-  cloudInner.appendChild(titleDiv);
+  dreamInner.appendChild(titleDiv);
 
   // 跋正文（按段落）
   const bodyDiv = document.createElement("div");
-  bodyDiv.className = "cloud-text-body";
+  bodyDiv.className = "dream-text-body";
   content.paragraphs.forEach((p) => {
     const para = document.createElement("p");
     para.innerText = p.trim();
     bodyDiv.appendChild(para);
   });
-  cloudInner.appendChild(bodyDiv);
+  dreamInner.appendChild(bodyDiv);
 
   // 署名
   const sourceDiv = document.createElement("div");
-  sourceDiv.className = "cloud-text-source";
+  sourceDiv.className = "dream-text-source";
   sourceDiv.innerText = "—— 花也怜侬";
-  cloudInner.appendChild(sourceDiv);
+  dreamInner.appendChild(sourceDiv);
 
   // 角色按语（scene.content）
   if (content.note && content.note.trim()) {
     const noteDiv = document.createElement("div");
-    noteDiv.className = "cloud-text-note";
+    noteDiv.className = "dream-text-note";
     noteDiv.innerText = content.note.trim();
-    cloudInner.appendChild(noteDiv);
+    dreamInner.appendChild(noteDiv);
   }
 
   // 滚动监听
   const scrollHandler = () => updateCloudScrollHint();
-  cloudInner._cloudScrollHandler = scrollHandler;
-  cloudInner.addEventListener("scroll", scrollHandler);
+  dreamInner._dreamScrollHandler = scrollHandler;
+  dreamInner.addEventListener("scroll", scrollHandler);
 
   // 滚动提示点击：向下滚动一屏
-  scrollHint.onclick = () => {
-    cloudInner.scrollTo({
-      top: cloudInner.scrollTop + cloudInner.clientHeight * 0.75,
-      behavior: "smooth",
-    });
-  };
-
-  // 印章提示点击：若未到底则滚底，否则聚焦首个按钮
-  stampHint.onclick = () => {
-    const canScroll = cloudInner.scrollHeight > cloudInner.clientHeight + 4;
-    const nearBottom = cloudInner.scrollTop + cloudInner.clientHeight >= cloudInner.scrollHeight - 24;
-    if (canScroll && !nearBottom) {
-      cloudInner.scrollTo({ top: cloudInner.scrollHeight, behavior: "smooth" });
-    } else {
-      cloudChoices.querySelector("button")?.focus();
-    }
-  };
+  if (scrollHint) {
+    scrollHint.onclick = () => {
+      dreamInner.scrollTo({
+        top: dreamInner.scrollTop + dreamInner.clientHeight * 0.75,
+        behavior: "smooth",
+      });
+    };
+  }
 
   // 渲染选择按钮
   choices.forEach((choice) => {
     const btn = document.createElement("button");
-    btn.className = "cloud-choice-button";
+    btn.className = "dream-choice-button";
     btn.innerText = choice.text;
     btn.addEventListener("click", () => {
       closeCloudPostscript(() => {
@@ -893,7 +846,7 @@ function renderCloudContent(scene, choices, content) {
         }
       });
     });
-    cloudChoices.appendChild(btn);
+    dreamChoices.appendChild(btn);
   });
 
   // 初始判断是否需要滚动提示
@@ -901,12 +854,12 @@ function renderCloudContent(scene, choices, content) {
 }
 
 function updateCloudScrollHint() {
-  const cloudInner = document.getElementById("cloud-text-inner");
-  const scrollHint = document.getElementById("cloud-text-scroll-hint");
-  if (!cloudInner || !scrollHint) return;
+  const dreamInner = document.getElementById("dream-text-inner");
+  const scrollHint = document.getElementById("dream-text-hint");
+  if (!dreamInner || !scrollHint) return;
 
-  const canScroll = cloudInner.scrollHeight > cloudInner.clientHeight + 4;
-  const nearBottom = cloudInner.scrollTop + cloudInner.clientHeight >= cloudInner.scrollHeight - 24;
+  const canScroll = dreamInner.scrollHeight > dreamInner.clientHeight + 4;
+  const nearBottom = dreamInner.scrollTop + dreamInner.clientHeight >= dreamInner.scrollHeight - 24;
 
   if (canScroll && !nearBottom) {
     scrollHint.classList.remove("hidden");
@@ -940,16 +893,14 @@ function closeCloudPostscript(onComplete) {
     setTimeout(() => {
       curtain.classList.add("hidden");
       curtain.classList.remove("opening");
-      clearCloudParticles();
-
-      const cloudInner = document.getElementById("cloud-text-inner");
-      if (cloudInner) {
-        const handler = cloudInner._cloudScrollHandler;
-        if (handler) cloudInner.removeEventListener("scroll", handler);
-        cloudInner.innerHTML = "";
+      const dreamInner = document.getElementById("dream-text-inner");
+      if (dreamInner) {
+        const handler = dreamInner._dreamScrollHandler;
+        if (handler) dreamInner.removeEventListener("scroll", handler);
+        dreamInner.innerHTML = "";
       }
-      const cloudChoices = document.getElementById("cloud-choices");
-      if (cloudChoices) cloudChoices.innerHTML = "";
+      const dreamChoices = document.getElementById("dream-choices");
+      if (dreamChoices) dreamChoices.innerHTML = "";
 
       onComplete?.();
     }, 1500);
