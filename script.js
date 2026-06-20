@@ -471,7 +471,7 @@ function getScene(sceneId) {
 }
 
 function isEndingScene(sceneId) {
-  return sceneId === "ending" || sceneId === "ending_zp" || sceneId === "ending_wl";
+  return sceneId === "ending" || sceneId.endsWith("_ending");
 }
 
 function isPostscriptScene(sceneId) {
@@ -618,6 +618,9 @@ function renderScene() {
   const ending = isEndingScene(currentSceneId);
   const postscript = isPostscriptScene(currentSceneId);
   const isIntro = currentSceneId === storyData?.startScene;
+
+  // 在人物结局界面隐藏“返回上一步”，仅保留“回到序章”
+  backButton.style.display = ending ? "none" : "";
   const appShell = document.querySelector(".app-shell");
   const enteringPostscript = postscript && !appShell?.classList.contains("postscript-phase");
 
