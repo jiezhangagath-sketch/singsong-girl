@@ -1077,13 +1077,15 @@ function initObjectModal() {
     console.log("[object] loading image:", imageUrl);
 
     const img = document.createElement("img");
-    img.src = imageUrl;
     img.alt = charName ? `${charName}的物件` : "物件";
 
     img.onload = () => {
       console.log("[object] image onload fired");
       console.log("[object] image natural size:", img.naturalWidth, "x", img.naturalHeight);
       console.log("[object] image wrap innerHTML length:", imageWrap.innerHTML.length);
+      // 显式写入原始宽高，避免 Safari 中动态图片高度计算异常
+      img.width = img.naturalWidth;
+      img.height = img.naturalHeight;
     };
     img.onerror = (err) => {
       console.error("[object] image failed to load:", imageUrl, err);
@@ -1096,6 +1098,7 @@ function initObjectModal() {
 
     imageWrap.innerHTML = "";
     imageWrap.appendChild(img);
+    img.src = imageUrl;
     console.log("[object] img appended to DOM");
   });
 }
