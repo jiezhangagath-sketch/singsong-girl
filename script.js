@@ -932,25 +932,31 @@ function closeCloudPostscript(onComplete) {
 
 /* ── 物件界面 ── */
 const objectTexts = {
-  cf: `拜盒是黄翠凤的物件。她和罗子富情谊初定，可仍有个蒋月琴，翠凤怎能做“垫空”，她要求罗子富二选一，此外口说无凭，定要罗子富拿个凭证来，就不怕他将来反悔。
+  "黄翠凤": `拜盒是黄翠凤的物件。她和罗子富情谊初定，可仍有个蒋月琴，翠凤怎能做“垫空”，她要求罗子富二选一，此外口说无凭，定要罗子富拿个凭证来，就不怕他将来反悔。
 黄翠凤看不上洋钱，看不上十对钏臂，只说“拜盒蛮好。”
 翠凤当然知道洋钱，钏臂这些个东西本身多少钱，就值多少钱。而拜盒不一样，看起来对黄翠凤黄二姐这拜盒没什么价值，可对于罗子富——这一当朝候补官员确实要紧得很。
 黄翠凤不仅选择了罗子富的拜盒，还给自己也准备一个一模一样的。
 赎身那日，她将再三复勘后的赎身文书装入自己的拜盒，并且与罗子富那只一起藏入朱漆皮箱。此时的黄翠凤再也与“无辜”两次不相干，不论她是否和黄二姐演戏诈骗，仅凭这大同小异的拜盒，她那张阴谋的网已经织得七七八八。罗子富也许感受到了某种不详，可是他已经来不及抽身。
 
 选择走完黄翠凤的故事线，你获得的物件是拜盒。`,
-  sy: `物件不揭示人物命运，仅仅只是代表人物在某个时间某个场所的选择。毕竟《海上花》从开始到结束也不过不到一年的时间，任何人都不能妄谈书中人的命运。
+  "周双玉": `物件不揭示人物命运，仅仅只是代表人物在某个时间某个场所的选择。毕竟《海上花》从开始到结束也不过不到一年的时间，任何人都不能妄谈书中人的命运。
 物件代表的是选择。人物在某时某刻选择了某个物件，某种层度上也选择了自己的命运。
 蟋蟀盒是周双玉的物件。逗蛐蛐有几分游戏意味，所以双玉，淑人和翠芬才津津有味。与翠凤的单纯可爱与淑人的心不在焉比，双玉受邀来到大观园，心理多少有几分忐忑，她知道那个盟誓是虚妄的，一边是游戏一边是命运，双玉在不知不觉中选了一条险峻艰难却可以峰回路转的道路。
 促织罐是她小女孩的玩心，也藏着她缜密的布局和思虑。
 五月斯螽动股，六月莎鸡振羽，七月在野，八月在宇，九月在户，十月蟋蟀入我床下。穹窒熏鼠，塞向墐户。嗟我妇子，曰为改岁，入此室处。
 在不确定的寒秋到来之前，她利用促织罐给自己做了一个确定的Plan B。
 选择走完双玉的故事线，你获得的物件是促织罐。`,
+  "匡二": `当票是匡二的物件。
+见识了大上海的花花世界，看到自己的主人李鹤汀身陷赌局所有的财务即将被掏空，又见四老爷李实夫像个冤大头一样被诸三姐和诸十全哄骗，匡二自有自己的一份清醒。
+那日从潘三处鬼混回来张寿一直同匡二打听着潘三，匡二自是不说用“我哪有有钱”搪塞过去。他与潘三红尘相识，姻缘自定，只差一份赎身和置产的钱就能远走高飞。与其让周少和、殳三这种流氓地痞骗得大少爷倾家荡产，还不如将那贵重财物拿来一用。
+匡二“盗亦有盗”将当票都留下了，李鹤汀知道他是留与主人赎还原物用，居然在破财之余“心中一宽”，可见李家财富之雄厚，匡二盗走的不过是九牛一毛。
+
+选择走完匡二的故事，你获得物件是当票。`,
 };
 
 const objectImages = {
-  cf: "images/人物與物件/浮雕锦地花鸟纹紫檀方盒.png",
-  sy: "images/人物與物件/葫蘆鑲象牙蟋蟀盒.jpeg",
+  "黄翠凤": "images/人物與物件/浮雕锦地花鸟纹紫檀方盒.png",
+  "周双玉": "images/人物與物件/葫蘆鑲象牙蟋蟀盒.jpeg",
 };
 
 function getCharacterPrefixFromPostscript(sceneId) {
@@ -972,20 +978,27 @@ function showObjectModal(scene) {
   title.innerText = charName ? `物件·${charName}` : "物件";
 
   // 文字
-  const text = prefix && objectTexts[prefix]
-    ? objectTexts[prefix]
+  const text = charName && objectTexts[charName]
+    ? objectTexts[charName]
     : "该人物物件文字待更新。";
   textEl.innerText = text;
 
   // 图片
   imageWrap.innerHTML = "";
-  const imagePath = prefix && objectImages[prefix]
-    ? objectImages[prefix]
+  const imagePath = charName && objectImages[charName]
+    ? objectImages[charName]
     : null;
   if (imagePath) {
     const img = document.createElement("img");
-    img.src = imagePath + "?t=" + Date.now();
+    img.src = encodeURI(imagePath) + "?t=" + Date.now();
     img.alt = charName ? `${charName}的物件` : "物件";
+    img.onerror = () => {
+      imageWrap.innerHTML = "";
+      const placeholder = document.createElement("div");
+      placeholder.className = "object-image-placeholder";
+      placeholder.innerText = "物件图片加载失败";
+      imageWrap.appendChild(placeholder);
+    };
     imageWrap.appendChild(img);
   } else {
     const placeholder = document.createElement("div");
