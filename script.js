@@ -959,9 +959,38 @@ const objectImages = {
   "周双玉": "images/人物與物件/葫蘆鑲象牙蟋蟀盒.jpeg",
 };
 
+// 场景 ID 前缀（如 cf / kuang / sy）与 characters 数组中 character.id 的映射
+const prefixToCharacterId = {
+  "cf": "huangcuifeng",
+  "kuang": "kuanger",
+  "sy": "zhoushuangyu",
+  "xh": "shenxiaohong",
+  "wl": "wangliansheng",
+  "zp": "zhaopuzhai",
+  "eb": "zhaoerbao",
+  "ht": "liheting",
+  "cxy": "chenxiaoyun",
+  "ajin": "ajin",
+};
+
 function getCharacterPrefixFromPostscript(sceneId) {
   if (!sceneId || !sceneId.endsWith("_postscript")) return null;
   return sceneId.replace("_postscript", "");
+}
+
+function resolveCharacterNameFromScene(scene) {
+  // 优先使用当前全局选中的角色（intro 选择后写入 selectedCharacter）
+  if (selectedCharacter) {
+    const bySelection = storyData?.characters?.find((c) => c.id === selectedCharacter);
+    if (bySelection?.name) return bySelection.name;
+  }
+
+  // 否则从场景 ID 前缀反查 character.id，再取 name
+  const prefix = getCharacterPrefixFromPostscript(scene?.id);
+  if (!prefix) return "";
+  const characterId = prefixToCharacterId[prefix];
+  const character = storyData?.characters?.find((c) => c.id === (characterId || prefix));
+  return character?.name || "";
 }
 
 function showObjectModal(scene) {
@@ -971,9 +1000,7 @@ function showObjectModal(scene) {
   const textEl = document.getElementById("object-text");
   if (!modal || !title || !imageWrap || !textEl) return;
 
-  const prefix = getCharacterPrefixFromPostscript(scene?.id);
-  const character = storyData?.characters?.find((c) => c.id === prefix);
-  const charName = character?.name || (prefix ? prefix.toUpperCase() : "");
+  const charName = resolveCharacterNameFromScene(scene);
 
   title.innerText = charName ? `物件·${charName}` : "物件";
 
