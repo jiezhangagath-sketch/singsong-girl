@@ -1073,7 +1073,7 @@ function initObjectModal() {
       return;
     }
 
-    const imageUrl = encodeURI(imagePath) + "?v=79";
+    const imageUrl = encodeURI(imagePath) + "?v=80";
     console.log("[object] loading image:", imageUrl);
 
     const img = document.createElement("img");
