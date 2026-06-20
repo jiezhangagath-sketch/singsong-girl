@@ -852,6 +852,15 @@ function renderCloudContent(scene, choices, content) {
     dreamChoices.appendChild(btn);
   });
 
+  // 阅读跋界面统一添加“获取物件”按钮
+  const getObjectBtn = document.createElement("button");
+  getObjectBtn.className = "dream-choice-button";
+  getObjectBtn.innerText = "获取物件";
+  getObjectBtn.addEventListener("click", () => {
+    showObjectModal(scene);
+  });
+  dreamChoices.appendChild(getObjectBtn);
+
   // 阅读跋界面统一添加“返回序幕”按钮
   const backToIntroBtn = document.createElement("button");
   backToIntroBtn.className = "dream-choice-button";
@@ -919,6 +928,90 @@ function closeCloudPostscript(onComplete) {
       onComplete?.();
     }, 1500);
   }, 400);
+}
+
+/* ── 物件界面 ── */
+const objectTexts = {
+  sy: `物件不揭示人物命运，仅仅只是代表人物在某个时间某个场所的选择。毕竟《海上花》从开始到结束也不过不到一年的时间，任何人都不能妄谈书中人的命运。
+物件代表的是选择。人物在某时某刻选择了某个物件，某种层度上也选择了自己的命运。
+蟋蟀盒是周双玉的物件。逗蛐蛐有几分游戏意味，所以双玉，淑人和翠芬才津津有味。与翠凤的单纯可爱与淑人的心不在焉比，双玉受邀来到大观园，心理多少有几分忐忑，她知道那个盟誓是虚妄的，一边是游戏一边是命运，双玉在不知不觉中选了一条险峻艰难却可以峰回路转的道路。
+促织罐是她小女孩的玩心，也藏着她缜密的布局和思虑。
+五月斯螽动股，六月莎鸡振羽，七月在野，八月在宇，九月在户，十月蟋蟀入我床下。穹窒熏鼠，塞向墐户。嗟我妇子，曰为改岁，入此室处。
+在不确定的寒秋到来之前，她利用促织罐给自己做了一个确定的Plan B。
+选择走完双玉的故事线，你获得的物件是促织罐。`,
+};
+
+const objectImages = {
+  sy: "images/人物與物件/葫蘆鑲象牙蟋蟀盒.jpeg",
+};
+
+function getCharacterPrefixFromPostscript(sceneId) {
+  if (!sceneId || !sceneId.endsWith("_postscript")) return null;
+  return sceneId.replace("_postscript", "");
+}
+
+function showObjectModal(scene) {
+  const modal = document.getElementById("object-modal");
+  const title = document.getElementById("object-title");
+  const imageWrap = document.getElementById("object-image-wrap");
+  const textEl = document.getElementById("object-text");
+  if (!modal || !title || !imageWrap || !textEl) return;
+
+  const prefix = getCharacterPrefixFromPostscript(scene?.id);
+  const character = storyData?.characters?.find((c) => c.id === prefix);
+  const charName = character?.name || (prefix ? prefix.toUpperCase() : "");
+
+  title.innerText = charName ? `物件·${charName}` : "物件";
+
+  // 文字
+  const text = prefix && objectTexts[prefix]
+    ? objectTexts[prefix]
+    : "该人物物件文字待更新。";
+  textEl.innerText = text;
+
+  // 图片
+  imageWrap.innerHTML = "";
+  const imagePath = prefix && objectImages[prefix]
+    ? objectImages[prefix]
+    : null;
+  if (imagePath) {
+    const img = document.createElement("img");
+    img.src = imagePath + "?t=" + Date.now();
+    img.alt = charName ? `${charName}的物件` : "物件";
+    imageWrap.appendChild(img);
+  } else {
+    const placeholder = document.createElement("div");
+    placeholder.className = "object-image-placeholder";
+    placeholder.innerText = "物件图片待更新";
+    imageWrap.appendChild(placeholder);
+  }
+
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function hideObjectModal() {
+  const modal = document.getElementById("object-modal");
+  if (!modal) return;
+  modal.classList.add("hidden");
+  document.body.style.overflow = "";
+}
+
+function initObjectModal() {
+  const backdrop = document.getElementById("object-modal-backdrop");
+  const closeBtn = document.getElementById("object-close");
+  const returnBtn = document.getElementById("object-return-btn");
+
+  backdrop?.addEventListener("click", () => {
+    hideObjectModal();
+  });
+  closeBtn?.addEventListener("click", () => {
+    hideObjectModal();
+  });
+  returnBtn?.addEventListener("click", () => {
+    hideObjectModal();
+    resetGame();
+  });
 }
 
 function renderPostscript(scene) {
@@ -1187,3 +1280,4 @@ function selectChoice(choice) {
 }
 
 loadStory();
+initObjectModal();

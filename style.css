@@ -1452,3 +1452,155 @@ body:has(.app-shell.postscript-phase)::before {
     opacity: 0.24;
   }
 }
+
+/* ── 物件界面 ── */
+.object-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  pointer-events: none;
+}
+
+.object-modal.hidden {
+  display: none;
+}
+
+.object-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(41, 36, 31, 0.55);
+  backdrop-filter: blur(4px);
+  pointer-events: auto;
+}
+
+.object-panel {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 92vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: rgba(244, 241, 234, 0.96);
+  border: 1px solid rgba(196, 165, 116, 0.35);
+  border-radius: 10px;
+  padding: 36px 40px;
+  box-shadow: 0 12px 60px rgba(41, 36, 31, 0.2);
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.object-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: #5a5045;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.object-close:hover {
+  color: #2a2520;
+}
+
+.object-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #2a2520;
+  letter-spacing: 0.15em;
+  margin-bottom: 24px;
+  font-family: "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif;
+}
+
+.object-image-wrap {
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 28px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f8f6f0;
+  box-shadow: 0 4px 20px rgba(41, 36, 31, 0.08);
+}
+
+.object-image-wrap img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.object-image-placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8a8a8a;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  background: #f0ece2;
+}
+
+.object-text {
+  width: 100%;
+  font-size: 1.0rem;
+  line-height: 2.2;
+  color: #2a2520;
+  text-align: justify;
+  letter-spacing: 0.02em;
+  white-space: pre-wrap;
+}
+
+.object-text p {
+  margin: 0 0 1.1em 0;
+  text-indent: 2em;
+}
+
+.object-text p:last-child {
+  margin-bottom: 0;
+}
+
+.object-actions {
+  margin-top: 28px;
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .object-panel {
+    padding: 28px 22px;
+    width: min(720px, 94vw);
+    max-height: 92vh;
+  }
+
+  .object-title {
+    font-size: 1.35rem;
+    margin-bottom: 18px;
+  }
+
+  .object-image-wrap {
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .object-text {
+    font-size: 0.95rem;
+    line-height: 2.0;
+  }
+
+  .object-actions {
+    margin-top: 22px;
+  }
+}
