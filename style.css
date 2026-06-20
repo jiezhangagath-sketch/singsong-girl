@@ -1531,6 +1531,8 @@ body:has(.app-shell.postscript-phase)::before {
   overflow: hidden;
   background: #f8f6f0;
   box-shadow: 0 4px 20px rgba(41, 36, 31, 0.08);
+  align-self: stretch;
+  flex-shrink: 0;
 }
 
 .object-image-wrap img {
