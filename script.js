@@ -852,6 +852,17 @@ function renderCloudContent(scene, choices, content) {
     dreamChoices.appendChild(btn);
   });
 
+  // 阅读跋界面统一添加“返回序幕”按钮
+  const backToIntroBtn = document.createElement("button");
+  backToIntroBtn.className = "dream-choice-button";
+  backToIntroBtn.innerText = "返回序幕";
+  backToIntroBtn.addEventListener("click", () => {
+    closeCloudPostscript(() => {
+      resetGame();
+    });
+  });
+  dreamChoices.appendChild(backToIntroBtn);
+
   // 初始判断是否需要滚动提示
   requestAnimationFrame(() => updateCloudScrollHint());
 }
