@@ -1553,6 +1553,39 @@ body:has(.app-shell.postscript-phase)::before {
   font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
 }
 
+.object-image-wrap.hidden {
+  display: none;
+}
+
+.object-reveal-button {
+  font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  padding: 12px 32px;
+  margin: 8px 0 20px;
+  background: rgba(122, 79, 50, 0.9);
+  border: 1px solid rgba(122, 79, 50, 0.95);
+  color: #fffbf5;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+  box-shadow: 0 2px 12px rgba(42, 37, 32, 0.12);
+}
+
+.object-reveal-button:hover {
+  background: rgba(154, 107, 74, 0.95);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 18px rgba(42, 37, 32, 0.16);
+}
+
+.object-reveal-button:active {
+  transform: translateY(0);
+}
+
+.object-reveal-button.hidden {
+  display: none;
+}
+
 .object-text {
   width: 100%;
   font-size: 1.02rem;

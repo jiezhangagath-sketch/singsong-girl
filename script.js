@@ -998,7 +998,8 @@ function showObjectModal(scene) {
   const title = document.getElementById("object-title");
   const imageWrap = document.getElementById("object-image-wrap");
   const textEl = document.getElementById("object-text");
-  if (!modal || !title || !imageWrap || !textEl) return;
+  const revealBtn = document.getElementById("object-reveal-btn");
+  if (!modal || !title || !imageWrap || !textEl || !revealBtn) return;
 
   const charName = resolveCharacterNameFromScene(scene);
 
@@ -1010,29 +1011,19 @@ function showObjectModal(scene) {
     : "该人物物件文字待更新。";
   textEl.innerText = text;
 
-  // 图片
+  // 重置为“未收获”状态：显示按钮、隐藏图片区
   imageWrap.innerHTML = "";
+  imageWrap.classList.add("hidden");
+  revealBtn.classList.remove("hidden");
+  revealBtn.disabled = false;
+  revealBtn.innerText = "收获物件";
+
+  // 把当前图片路径和角色名写入 data 属性，供按钮点击时读取
   const imagePath = charName && objectImages[charName]
     ? objectImages[charName]
-    : null;
-  if (imagePath) {
-    const img = document.createElement("img");
-    img.src = encodeURI(imagePath) + "?v=76";
-    img.alt = charName ? `${charName}的物件` : "物件";
-    img.onerror = () => {
-      imageWrap.innerHTML = "";
-      const placeholder = document.createElement("div");
-      placeholder.className = "object-image-placeholder";
-      placeholder.innerText = "物件图片加载失败";
-      imageWrap.appendChild(placeholder);
-    };
-    imageWrap.appendChild(img);
-  } else {
-    const placeholder = document.createElement("div");
-    placeholder.className = "object-image-placeholder";
-    placeholder.innerText = "物件图片待更新";
-    imageWrap.appendChild(placeholder);
-  }
+    : "";
+  revealBtn.dataset.imagePath = imagePath;
+  revealBtn.dataset.charName = charName || "";
 
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
@@ -1049,6 +1040,8 @@ function initObjectModal() {
   const backdrop = document.getElementById("object-modal-backdrop");
   const closeBtn = document.getElementById("object-close");
   const returnBtn = document.getElementById("object-return-btn");
+  const revealBtn = document.getElementById("object-reveal-btn");
+  const imageWrap = document.getElementById("object-image-wrap");
 
   backdrop?.addEventListener("click", () => {
     hideObjectModal();
@@ -1059,6 +1052,35 @@ function initObjectModal() {
   returnBtn?.addEventListener("click", () => {
     hideObjectModal();
     resetGame();
+  });
+
+  revealBtn?.addEventListener("click", () => {
+    if (!imageWrap) return;
+    const imagePath = revealBtn.dataset.imagePath;
+    const charName = revealBtn.dataset.charName || "";
+
+    revealBtn.classList.add("hidden");
+    imageWrap.classList.remove("hidden");
+    imageWrap.innerHTML = "";
+
+    if (imagePath) {
+      const img = document.createElement("img");
+      img.src = encodeURI(imagePath) + "?v=77";
+      img.alt = charName ? `${charName}的物件` : "物件";
+      img.onerror = () => {
+        imageWrap.innerHTML = "";
+        const placeholder = document.createElement("div");
+        placeholder.className = "object-image-placeholder";
+        placeholder.innerText = "物件图片加载失败";
+        imageWrap.appendChild(placeholder);
+      };
+      imageWrap.appendChild(img);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.className = "object-image-placeholder";
+      placeholder.innerText = "物件图片待更新";
+      imageWrap.appendChild(placeholder);
+    }
   });
 }
 
