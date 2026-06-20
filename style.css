@@ -1534,10 +1534,10 @@ body:has(.app-shell.postscript-phase)::before {
 }
 
 .object-image-wrap img {
-  width: 100%;
-  height: auto;
   display: block;
-  object-fit: contain;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
 }
 
 .object-image-placeholder {

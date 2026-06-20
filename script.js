@@ -1073,21 +1073,17 @@ function initObjectModal() {
       return;
     }
 
-    // 先显示加载占位
-    const loading = document.createElement("div");
-    loading.className = "object-image-placeholder";
-    loading.innerText = "物件图片加载中……";
-    imageWrap.appendChild(loading);
-
-    const img = new Image();
-    const imageUrl = encodeURI(imagePath) + "?v=78";
+    const imageUrl = encodeURI(imagePath) + "?v=79";
     console.log("[object] loading image:", imageUrl);
 
+    const img = document.createElement("img");
+    img.src = imageUrl;
+    img.alt = charName ? `${charName}的物件` : "物件";
+
     img.onload = () => {
-      console.log("[object] image loaded successfully");
-      imageWrap.innerHTML = "";
-      img.alt = charName ? `${charName}的物件` : "物件";
-      imageWrap.appendChild(img);
+      console.log("[object] image onload fired");
+      console.log("[object] image natural size:", img.naturalWidth, "x", img.naturalHeight);
+      console.log("[object] image wrap innerHTML length:", imageWrap.innerHTML.length);
     };
     img.onerror = (err) => {
       console.error("[object] image failed to load:", imageUrl, err);
@@ -1097,7 +1093,10 @@ function initObjectModal() {
       placeholder.innerText = "物件图片加载失败";
       imageWrap.appendChild(placeholder);
     };
-    img.src = imageUrl;
+
+    imageWrap.innerHTML = "";
+    imageWrap.appendChild(img);
+    console.log("[object] img appended to DOM");
   });
 }
 
