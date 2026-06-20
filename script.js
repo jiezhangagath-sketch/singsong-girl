@@ -1059,28 +1059,45 @@ function initObjectModal() {
     const imagePath = revealBtn.dataset.imagePath;
     const charName = revealBtn.dataset.charName || "";
 
+    console.log("[object] reveal clicked", { charName, imagePath });
+
     revealBtn.classList.add("hidden");
     imageWrap.classList.remove("hidden");
     imageWrap.innerHTML = "";
 
-    if (imagePath) {
-      const img = document.createElement("img");
-      img.src = encodeURI(imagePath) + "?v=77";
-      img.alt = charName ? `${charName}的物件` : "物件";
-      img.onerror = () => {
-        imageWrap.innerHTML = "";
-        const placeholder = document.createElement("div");
-        placeholder.className = "object-image-placeholder";
-        placeholder.innerText = "物件图片加载失败";
-        imageWrap.appendChild(placeholder);
-      };
-      imageWrap.appendChild(img);
-    } else {
+    if (!imagePath) {
       const placeholder = document.createElement("div");
       placeholder.className = "object-image-placeholder";
       placeholder.innerText = "物件图片待更新";
       imageWrap.appendChild(placeholder);
+      return;
     }
+
+    // 先显示加载占位
+    const loading = document.createElement("div");
+    loading.className = "object-image-placeholder";
+    loading.innerText = "物件图片加载中……";
+    imageWrap.appendChild(loading);
+
+    const img = new Image();
+    const imageUrl = encodeURI(imagePath) + "?v=78";
+    console.log("[object] loading image:", imageUrl);
+
+    img.onload = () => {
+      console.log("[object] image loaded successfully");
+      imageWrap.innerHTML = "";
+      img.alt = charName ? `${charName}的物件` : "物件";
+      imageWrap.appendChild(img);
+    };
+    img.onerror = (err) => {
+      console.error("[object] image failed to load:", imageUrl, err);
+      imageWrap.innerHTML = "";
+      const placeholder = document.createElement("div");
+      placeholder.className = "object-image-placeholder";
+      placeholder.innerText = "物件图片加载失败";
+      imageWrap.appendChild(placeholder);
+    };
+    img.src = imageUrl;
   });
 }
 
