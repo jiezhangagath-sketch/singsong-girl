@@ -1017,7 +1017,7 @@ function showObjectModal(scene) {
     : null;
   if (imagePath) {
     const img = document.createElement("img");
-    img.src = encodeURI(imagePath) + "?t=" + Date.now();
+    img.src = encodeURI(imagePath) + "?v=76";
     img.alt = charName ? `${charName}的物件` : "物件";
     img.onerror = () => {
       imageWrap.innerHTML = "";

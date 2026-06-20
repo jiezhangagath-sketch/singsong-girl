@@ -1520,7 +1520,7 @@ body:has(.app-shell.postscript-phase)::before {
   color: #2a2520;
   letter-spacing: 0.15em;
   margin-bottom: 24px;
-  font-family: "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif;
+  font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
 }
 
 .object-image-wrap {
@@ -1550,16 +1550,18 @@ body:has(.app-shell.postscript-phase)::before {
   font-size: 0.95rem;
   letter-spacing: 0.05em;
   background: #f0ece2;
+  font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
 }
 
 .object-text {
   width: 100%;
-  font-size: 1.0rem;
-  line-height: 2.2;
+  font-size: 1.02rem;
+  line-height: 2.3;
   color: #2a2520;
   text-align: justify;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   white-space: pre-wrap;
+  font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
 }
 
 .object-text p {
