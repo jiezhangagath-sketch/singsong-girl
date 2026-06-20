@@ -1489,9 +1489,6 @@ body:has(.app-shell.postscript-phase)::before {
   padding: 36px 40px;
   box-shadow: 0 12px 60px rgba(41, 36, 31, 0.2);
   pointer-events: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-align: center;
 }
 
@@ -1526,13 +1523,11 @@ body:has(.app-shell.postscript-phase)::before {
 .object-image-wrap {
   width: 100%;
   max-width: 420px;
-  margin-bottom: 28px;
+  margin: 0 auto 28px;
   border-radius: 6px;
   overflow: hidden;
   background: #f8f6f0;
   box-shadow: 0 4px 20px rgba(41, 36, 31, 0.08);
-  align-self: stretch;
-  flex-shrink: 0;
 }
 
 .object-image-wrap img {
