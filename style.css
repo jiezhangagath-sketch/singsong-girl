@@ -1145,47 +1145,149 @@ body:has(.app-shell.postscript-phase)::before {
   margin-bottom: 0;
 }
 
-/* ── 梦境过渡：线描插图 + 跋文 ── */
+/* ── 梦境过渡：朵云拱月 + 跋文（沉夜版） ── */
 .cloud-curtain {
   position: fixed;
   inset: 0;
   z-index: 1000;
   pointer-events: none;
   overflow: hidden;
-  background: #f4f1ea;
-}
-
-.cloud-curtain::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("images/background-sm.webp");
-  background-size: cover;
-  background-position: center;
-  opacity: 0.55;
-  z-index: 0;
-  pointer-events: none;
+  background: linear-gradient(180deg, #2e2820 0%, #231e18 60%, #1d1913 100%);
 }
 
 .cloud-curtain.hidden {
   display: none;
 }
 
-/* 氛围底图：不再使用，由云纹背景替代 */
-.dream-atmosphere {
-  display: none;
+/* 云幕开合：淡入（closing）与淡出（opening） */
+.cloud-curtain.closing {
+  animation: curtainFadeIn 1.3s ease forwards;
 }
 
-/* 插图地图已移除：僅保留雲氣圖樣底紋 */
-.dream-illustration {
-  display: none;
+.cloud-curtain.opening {
+  animation: curtainFadeOut 1.5s ease forwards;
 }
 
-/* 淡墨晕染、霧氣層與雲紋邊角裝飾均已移除：僅保留雲氣圖樣底紋 */
-.cloud-ink-wash,
-.cloud-mist,
-.dream-cloud {
-  display: none;
+@keyframes curtainFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes curtainFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* ── 如意朵云：左上、右下两角，超慢漂移 ── */
+.dream-ruyi {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2.4s ease 0.8s;
+}
+
+.dream-ruyi-tl {
+  top: -60px;
+  left: -70px;
+  width: 460px;
+}
+
+.dream-ruyi-br {
+  bottom: -90px;
+  right: -190px;
+  width: 520px;
+  transform: scaleX(-1);
+}
+
+.cloud-curtain.closing .dream-ruyi-tl {
+  opacity: 0.26;
+  animation: ruyiDriftTl 36s ease-in-out infinite alternate;
+}
+
+.cloud-curtain.closing .dream-ruyi-br {
+  opacity: 0.2;
+  animation: ruyiDriftBr 44s ease-in-out infinite alternate;
+}
+
+@keyframes ruyiDriftTl {
+  from { transform: translate(0, 0); }
+  to { transform: translate(1.5%, 1%); }
+}
+
+@keyframes ruyiDriftBr {
+  from { transform: scaleX(-1) translate(0, 0); }
+  to { transform: scaleX(-1) translate(1.5%, 1%); }
+}
+
+/* ── 烘云托月：右上角，夜色中光晕自然显现 ── */
+.moon-wrap {
+  position: absolute;
+  right: 8%;
+  top: 9%;
+  width: 230px;
+  height: 230px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2.6s ease 1.2s;
+}
+
+.cloud-curtain.closing .moon-wrap {
+  opacity: 1;
+}
+
+.moon-wash {
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(236, 222, 188, 0.06) 0%, rgba(236, 222, 188, 0.02) 52%, transparent 70%);
+  animation: moonWash 7s ease-in-out infinite;
+}
+
+.moon-halo {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(243, 231, 200, 0.32) 0%, rgba(243, 231, 200, 0.1) 46%, transparent 68%);
+  animation: moonHalo 7s ease-in-out infinite;
+}
+
+.moon-disc {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 44%;
+  height: 44%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 38%,
+    rgba(253, 248, 232, 0.92) 0%, rgba(247, 238, 216, 0.78) 46%, rgba(243, 231, 200, 0.4) 68%, transparent 78%);
+  box-shadow: 0 0 38px 12px rgba(236, 222, 188, 0.32);
+}
+
+.moon-wisp {
+  position: absolute;
+  width: 74%;
+  left: 22%;
+  top: 46%;
+  opacity: 0.6;
+  animation: wispDrift 22s ease-in-out infinite alternate;
+}
+
+@keyframes moonWash {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+@keyframes moonHalo {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@keyframes wispDrift {
+  from { transform: translateX(-4%); }
+  to { transform: translateX(5%); }
 }
 
 /* 跋文面板：居中於雲氣底紋之上 */
@@ -1212,33 +1314,50 @@ body:has(.app-shell.postscript-phase)::before {
 }
 
 .dream-text-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 600;
-  color: #2a2520;
-  letter-spacing: 0.2em;
+  color: #c9ab78;
+  letter-spacing: 0.34em;
   text-align: center;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
+  margin: 0 auto 18px;
+  padding: 6px 2px;
+  writing-mode: vertical-rl;
   font-family: "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif SC", serif;
-  text-shadow: 0 1px 0 rgba(255, 250, 240, 0.7);
+  text-shadow: 0 0 18px rgba(201, 171, 120, 0.25);
+}
+
+/* 标题逐字：自烟中浮现 */
+.dream-text-title .dream-char {
+  display: inline-block;
+  opacity: 0;
+  animation: dreamCharReveal 1s ease forwards;
+}
+
+@keyframes dreamCharReveal {
+  from {
+    opacity: 0;
+    filter: blur(7px);
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
 }
 
 .dream-text-inner {
-  max-height: 58vh;
+  max-height: 62vh;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 18px 22px;
+  padding: 10px 22px;
   font-size: 1.02rem;
   line-height: 2.3;
-  color: #2a2520;
+  color: #e3d9c6;
   letter-spacing: 0.03em;
   text-align: justify;
-  background: rgba(244, 241, 234, 0.82);
-  border-radius: 10px;
-  backdrop-filter: blur(3px);
-  box-shadow: 0 6px 32px rgba(60, 52, 42, 0.1);
   scrollbar-width: thin;
-  scrollbar-color: rgba(42, 37, 32, 0.2) transparent;
+  scrollbar-color: rgba(216, 203, 184, 0.25) transparent;
 }
 
 .dream-text-inner::-webkit-scrollbar {
@@ -1250,15 +1369,25 @@ body:has(.app-shell.postscript-phase)::before {
 }
 
 .dream-text-inner::-webkit-scrollbar-thumb {
-  background: rgba(42, 37, 32, 0.2);
+  background: rgba(216, 203, 184, 0.25);
   border-radius: 2px;
 }
 
 .dream-text-body {
   font-size: 0.96rem;
   line-height: 2.2;
-  color: #2a2520;
+  color: #e3d9c6;
   text-align: justify;
+}
+
+/* 标题下的细分隔线（笺纸式） */
+.dream-text-body::before {
+  content: "";
+  display: block;
+  width: 1px;
+  height: 26px;
+  background: rgba(201, 171, 120, 0.4);
+  margin: 0 auto 18px;
 }
 
 .dream-text-body p {
@@ -1273,9 +1402,9 @@ body:has(.app-shell.postscript-phase)::before {
 .dream-text-source {
   margin-top: 16px;
   padding-top: 12px;
-  border-top: 1px dashed rgba(42, 37, 32, 0.15);
+  border-top: 1px dashed rgba(216, 203, 184, 0.22);
   font-size: 0.86rem;
-  color: #5a5045;
+  color: #a3937a;
   text-align: right;
   letter-spacing: 0.08em;
 }
@@ -1283,37 +1412,38 @@ body:has(.app-shell.postscript-phase)::before {
 .dream-text-note {
   margin-top: 16px;
   padding: 12px 16px;
-  border-left: 2px solid rgba(42, 37, 32, 0.15);
-  background: rgba(255, 253, 248, 0.6);
+  border-left: 2px solid rgba(201, 171, 120, 0.35);
+  background: rgba(255, 250, 238, 0.05);
   font-size: 0.9rem;
   line-height: 1.9;
-  color: #4a4038;
+  color: #cfc2ab;
   text-align: justify;
   font-style: italic;
 }
 
-/* 滚动提示 */
+/* 滚动提示：朱文印章样式 */
 .dream-text-hint {
   margin-top: 12px;
   font-size: 0.76rem;
-  color: #5a5045;
-  letter-spacing: 0.1em;
+  color: #d07766;
+  letter-spacing: 0.14em;
   opacity: 0;
-  transition: opacity 0.8s ease;
+  transition: opacity 0.8s ease, box-shadow 0.4s ease;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  padding: 6px 14px;
-  border-radius: 20px;
-  background: rgba(244, 241, 234, 0.7);
-  border: 1px solid rgba(42, 37, 32, 0.08);
+  padding: 7px 16px;
+  border-radius: 3px;
+  background: rgba(29, 25, 19, 0.55);
+  border: 1px solid rgba(208, 119, 102, 0.45);
+  box-shadow: inset 0 0 0 2px rgba(208, 119, 102, 0.08);
   pointer-events: none;
 }
 
 .cloud-curtain.cloud-text-visible .dream-text-hint {
-  opacity: 0.75;
-  transition: opacity 0.8s ease 1s;
+  opacity: 0.78;
+  transition: opacity 0.8s ease 1s, box-shadow 0.4s ease;
   pointer-events: auto;
 }
 
@@ -1324,8 +1454,9 @@ body:has(.app-shell.postscript-phase)::before {
 
 .dream-text-hint:hover {
   opacity: 1 !important;
-  background: rgba(255, 253, 248, 0.9);
-  border-color: rgba(42, 37, 32, 0.18);
+  background: rgba(29, 25, 19, 0.8);
+  border-color: rgba(208, 119, 102, 0.7);
+  box-shadow: 0 0 16px rgba(208, 119, 102, 0.3), inset 0 0 0 2px rgba(208, 119, 102, 0.12);
 }
 
 .dream-text-hint span:first-child {
@@ -1364,22 +1495,22 @@ body:has(.app-shell.postscript-phase)::before {
   font-size: 0.9rem;
   letter-spacing: 0.08em;
   padding: 10px 26px;
-  background: rgba(244, 241, 234, 0.78);
-  border: 1px solid rgba(42, 37, 32, 0.18);
-  color: #2a2520;
+  background: rgba(46, 40, 32, 0.6);
+  border: 1px solid rgba(201, 171, 120, 0.35);
+  color: #d8ccb8;
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 2px;
   backdrop-filter: blur(2px);
-  box-shadow: 0 2px 12px rgba(42, 37, 32, 0.06);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
 }
 
 .dream-choice-button:hover {
-  background: rgba(255, 253, 248, 0.95);
-  border-color: rgba(42, 37, 32, 0.35);
-  color: #1a1510;
+  background: rgba(201, 171, 120, 0.16);
+  border-color: rgba(201, 171, 120, 0.6);
+  color: #f0e6d2;
   transform: translateY(-2px);
-  box-shadow: 0 4px 18px rgba(42, 37, 32, 0.1);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
 }
 
 .dream-choice-button:active {
@@ -1419,9 +1550,9 @@ body:has(.app-shell.postscript-phase)::before {
   }
 
   .dream-text-title {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
+    letter-spacing: 0.28em;
     margin-bottom: 12px;
-    padding-bottom: 8px;
   }
 
   .dream-choices {
@@ -1440,16 +1571,20 @@ body:has(.app-shell.postscript-phase)::before {
     font-size: 0.85rem;
   }
 
-  .dream-cloud-left {
-    width: 60vw;
-    height: 60vw;
-    opacity: 0.28;
+  .dream-ruyi-tl {
+    width: 300px;
+    top: -50px;
+    left: -60px;
   }
 
-  .dream-cloud-right {
-    width: 55vw;
-    height: 55vw;
-    opacity: 0.24;
+  .dream-ruyi-br {
+    width: 340px;
+    bottom: -70px;
+    right: -70px;
+  }
+
+  .moon-wrap {
+    display: none; /* 小屏正文满宽，月亮会压字，仅保留朵云两角 */
   }
 }
 

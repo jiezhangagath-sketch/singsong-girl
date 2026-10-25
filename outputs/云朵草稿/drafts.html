@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>云朵草稿</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #ddd; font-family: "Noto Serif SC", "Songti SC", "STSong", serif; }
+  .draft {
+    position: relative;
+    width: 1280px;
+    height: 800px;
+    overflow: hidden;
+    margin: 24px auto;
+    background: #f4f1ea;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  }
+  .draft-label {
+    position: absolute; top: 14px; right: 18px; z-index: 50;
+    font-size: 13px; letter-spacing: 0.2em; color: #9e3a2e;
+    border: 1px solid rgba(158,58,46,.45); padding: 4px 12px;
+    background: rgba(255,253,248,.85);
+  }
+  .bg-pattern {
+    position: absolute; inset: 0; z-index: 0;
+    background: url("../../images/background-sm.webp") center / cover;
+    opacity: .22;
+  }
+
+  /* 共用元素：烘云托月（无边界，光晕烘出，云缕掠月） */
+  .moon-wrap { position: absolute; z-index: 2; }
+  .moon-wash {
+    position: absolute; inset: -18%; border-radius: 50%;
+    background: radial-gradient(circle, rgba(110, 95, 74, .16) 0%, rgba(110, 95, 74, .06) 52%, transparent 70%);
+  }
+  .moon-halo {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: radial-gradient(circle, rgba(243,231,200,.62) 0%, rgba(243,231,200,.2) 46%, transparent 68%);
+  }
+  .moon-disc {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    width: 44%; height: 44%; border-radius: 50%;
+    background: radial-gradient(circle at 42% 38%,
+      #fffdf5 0%, #faf2dd 46%, rgba(243,231,200,.72) 68%, transparent 78%);
+    box-shadow: 0 0 44px 14px rgba(236,222,188,.55);
+  }
+  .moon-wisp {
+    position: absolute; pointer-events: none;
+  }
+  .v-title {
+    writing-mode: vertical-rl;
+    font-family: "Kaiti SC", "STKaiti", "KaiTi", serif;
+    font-weight: 600; color: #2a2520;
+    letter-spacing: .34em;
+  }
+  .paper-card {
+    background: rgba(244,241,234,.82);
+    border-radius: 10px;
+    box-shadow: 0 6px 32px rgba(60,52,42,.10);
+    backdrop-filter: blur(2px);
+  }
+  .body-text {
+    font-size: 15px; line-height: 2.2; color: #2a2520;
+    letter-spacing: .03em; text-align: justify;
+  }
+  .body-text p { text-indent: 2em; margin-bottom: 1em; }
+  .choices {
+    position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 14px; z-index: 20;
+  }
+  .btn {
+    font-size: 14px; letter-spacing: .08em; padding: 10px 26px;
+    background: rgba(244,241,234,.8); border: 1px solid rgba(42,37,32,.18);
+    color: #2a2520; border-radius: 2px;
+  }
+  .cloud-img { position: absolute; mix-blend-mode: multiply; z-index: 2; }
+
+  /* ── 草稿A：烟路入梦 ── */
+  #draftA .silhouette {
+    position: absolute; right: -40px; bottom: 0; z-index: 1;
+    width: 620px;
+    mix-blend-mode: multiply; opacity: .38;
+    -webkit-mask-image: linear-gradient(to top, black 60%, transparent 97%);
+    mask-image: linear-gradient(to top, black 60%, transparent 97%);
+  }
+  #draftA .trail { position: absolute; inset: 0; z-index: 2; }
+  #draftA .cloud-top { top: 8px; left: 50%; transform: translateX(-55%); width: 400px; opacity: .85; }
+  #draftA .cloud-left { left: 60px; bottom: 200px; width: 150px; opacity: .6; }
+  #draftA .moon-wrap { left: 70px; bottom: 310px; width: 170px; height: 170px; }
+  #draftA .moon-wisp-1 { width: 110px; left: 36%; top: 52%; opacity: .45; }
+  #draftA .panel {
+    position: absolute; top: 200px; left: 50%; transform: translateX(-50%);
+    z-index: 10; width: 520px; padding: 26px 30px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  #draftA .v-title { font-size: 21px; margin-bottom: 16px; }
+
+  /* ── 草稿B：朵云拱月 ── */
+  #draftB { background: #f6f2e8; }
+  #draftB .ruyi-tl { top: -60px; left: -70px; width: 460px; opacity: .20; z-index: 1; }
+  #draftB .ruyi-br { bottom: -90px; right: -80px; width: 520px; opacity: .16; z-index: 1; transform: scaleX(-1); }
+  #draftB .moon-wrap { left: 100px; top: 38%; width: 230px; height: 230px; }
+  #draftB .moon-wisp-1 { width: 170px; left: 22%; top: 46%; opacity: .6; }
+  #draftB .panel {
+    position: absolute; top: 90px; left: 50%; transform: translateX(-50%);
+    z-index: 10; width: 560px; display: flex; flex-direction: column; align-items: center;
+  }
+  #draftB .v-title { font-size: 24px; margin-bottom: 6px; }
+  #draftB .divider {
+    width: 1px; height: 26px; background: rgba(58,50,40,.35); margin: 10px 0 18px;
+  }
+  #draftB .body-text { font-size: 15.5px; }
+
+  /* ── 草稿C：流云飞白 ── */
+  #draftC .drift-1 { top: 26px; left: 56px; width: 260px; opacity: .7; }
+  #draftC .drift-2 { top: 110px; right: 120px; width: 140px; opacity: .4; }
+  #draftC .drift-3 { top: 10px; right: 420px; width: 120px; opacity: .45; }
+  #draftC .gold-band {
+    position: absolute; left: 50%; bottom: -120px; transform: translateX(-50%);
+    width: 900px; opacity: .13; z-index: 1;
+  }
+  #draftC .moon-wrap { right: 90px; top: 100px; width: 150px; height: 150px; }
+  #draftC .moon-wisp-1 { width: 100px; left: 30%; top: 50%; opacity: .4; }
+  #draftC .panel {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    z-index: 10; width: 540px; padding: 24px 30px;
+    display: flex; flex-direction: row; align-items: flex-start; gap: 24px;
+  }
+  #draftC .v-title { font-size: 21px; padding-top: 4px; border-left: 1px solid rgba(58,50,40,.25); padding-left: 14px; }
+  #draftC .col { flex: 1; }
+</style>
+</head>
+<body>
+
+<!-- 草稿A：烟路入梦 -->
+<section class="draft" id="draftA">
+  <div class="bg-pattern"></div>
+  <img class="silhouette" src="../../images/dream-silhouette.webp" />
+  <svg class="trail" viewBox="0 0 1280 800" preserveAspectRatio="none">
+    <path d="M 900 620 C 840 555, 955 515, 875 465 C 795 415, 700 445, 678 385 C 656 325, 725 295, 705 205"
+          fill="none" stroke="#453b30" stroke-width="2" opacity=".55" stroke-linecap="round"/>
+    <path d="M 908 626 C 850 561, 963 521, 885 471 C 807 423, 712 451, 690 391 C 668 333, 731 303, 715 212"
+          fill="none" stroke="#453b30" stroke-width=".9" opacity=".4" stroke-linecap="round"/>
+  </svg>
+  <img class="cloud-img cloud-top" src="assets/cloud-top.webp" />
+  <img class="cloud-img cloud-left" src="assets/cloud-left.webp" />
+  <div class="moon-wrap"><div class="moon-wash"></div><div class="moon-halo"></div><div class="moon-disc"></div><img class="moon-wisp moon-wisp-1" src="assets/cloud-left-a.png" /></div>
+  <div class="panel paper-card">
+    <div class="v-title">跋·沈小红</div>
+    <div class="body-text">
+      <p>客有造花也怜侬之室而索六十四回以后之底稿者。花也怜侬笑指其腹曰：“稿在是矣。”</p>
+      <p>客请言其梗概。花也怜侬皇然以惊曰：“客岂有得于吾书耶，抑无得于吾书耶？吾书六十四回，赅矣，尽矣，其又何言耶？……”</p>
+    </div>
+  </div>
+  <div class="choices"><button class="btn">获取物件</button><button class="btn">返回序幕</button></div>
+  <div class="draft-label">草稿 A · 烟路入梦</div>
+</section>
+
+<!-- 草稿B：朵云拱月 -->
+<section class="draft" id="draftB">
+  <img class="cloud-img ruyi-tl" src="assets/cloud-ruyi-ink.png" />
+  <img class="cloud-img ruyi-br" src="assets/cloud-ruyi-ink.png" />
+  <div class="moon-wrap"><div class="moon-wash"></div><div class="moon-halo"></div><div class="moon-disc"></div><img class="moon-wisp moon-wisp-1" src="assets/cloud-left-a.png" /></div>
+  <div class="panel">
+    <div class="v-title">跋·沈小红</div>
+    <div class="divider"></div>
+    <div class="body-text">
+      <p>客有造花也怜侬之室而索六十四回以后之底稿者。花也怜侬笑指其腹曰：“稿在是矣。”</p>
+      <p>客请言其梗概。花也怜侬皇然以惊曰：“客岂有得于吾书耶，抑无得于吾书耶？吾书六十四回，赅矣，尽矣，其又何言耶？……”</p>
+    </div>
+  </div>
+  <div class="choices"><button class="btn">获取物件</button><button class="btn">返回序幕</button></div>
+  <div class="draft-label">草稿 B · 朵云拱月</div>
+</section>
+
+<!-- 草稿C：流云飞白 -->
+<section class="draft" id="draftC">
+  <div class="bg-pattern"></div>
+  <img class="cloud-img drift-1" src="assets/cloud-top.webp" />
+  <img class="cloud-img drift-2" src="assets/cloud-mid.webp" />
+  <img class="cloud-img drift-3" src="assets/cloud-left.webp" />
+  <img class="cloud-img gold-band" src="assets/cloud-gold-ink.png" />
+  <div class="moon-wrap"><div class="moon-wash"></div><div class="moon-halo"></div><div class="moon-disc"></div><img class="moon-wisp moon-wisp-1" src="assets/cloud-left-a.png" /></div>
+  <div class="panel paper-card">
+    <div class="v-title">跋·沈小红</div>
+    <div class="col body-text">
+      <p>客有造花也怜侬之室而索六十四回以后之底稿者。花也怜侬笑指其腹曰：“稿在是矣。”</p>
+      <p>客请言其梗概。花也怜侬皇然以惊曰：“客岂有得于吾书耶，抑无得于吾书耶？吾书六十四回，赅矣，尽矣，其又何言耶？……”</p>
+    </div>
+  </div>
+  <div class="choices"><button class="btn">获取物件</button><button class="btn">返回序幕</button></div>
+  <div class="draft-label">草稿 C · 流云飞白</div>
+</section>
+
+</body>
+</html>

@@ -772,6 +772,10 @@ async function loadCloudPostscriptContent(scene) {
   }
 
   const paragraphs = fullText.trim().split(/\n+/).filter((p) => p.trim());
+  // 首段若为独立的“跋”字标题则略去（竖排标题已呈现）
+  if (paragraphs.length && paragraphs[0].trim() === "跋") {
+    paragraphs.shift();
+  }
   return {
     paragraphs,
     note: scene.content || "",
@@ -790,10 +794,17 @@ function renderCloudContent(scene, choices, content) {
   const oldScrollHandler = dreamInner._dreamScrollHandler;
   if (oldScrollHandler) dreamInner.removeEventListener("scroll", oldScrollHandler);
 
-  // 标题
+  // 标题（竖排，逐字自烟中浮现）
   const titleDiv = document.createElement("div");
   titleDiv.className = "dream-text-title";
-  titleDiv.innerText = scene.title || "跋";
+  const titleText = scene.title || "跋";
+  Array.from(titleText).forEach((ch, i) => {
+    const span = document.createElement("span");
+    span.className = "dream-char";
+    span.innerText = ch;
+    span.style.animationDelay = `${0.4 + i * 0.3}s`;
+    titleDiv.appendChild(span);
+  });
   dreamInner.appendChild(titleDiv);
 
   // 跋正文（按段落）

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>《海上花》互动体验</title>
-  <link rel="stylesheet" href="style.css?v=82" />
+  <link rel="stylesheet" href="style.css?v=84" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -47,21 +47,19 @@
     </div>
   </main>
 
-  <!-- 梦境过渡：第20回插图 + 跋文 -->
+  <!-- 梦境过渡：朵云拱月 + 跋文 -->
   <div id="cloud-curtain" class="cloud-curtain hidden">
-    <!-- 氛围底图：模糊延展的插图，填补边距并营造梦境 -->
-    <div class="dream-atmosphere" id="dream-atmosphere"></div>
-    
-    <!-- 第20回梦魇插图底图（人物已删除） -->
-    <div class="dream-illustration" id="dream-illustration"></div>
-    
-    <!-- 淡墨晕染层 -->
-    <div class="cloud-ink-wash"></div>
-    <div class="cloud-mist"></div>
-    
-    <!-- 云纹边角装饰 -->
-    <div class="dream-cloud dream-cloud-left"></div>
-    <div class="dream-cloud dream-cloud-right"></div>
+    <!-- 如意朵云：左上、右下两角（夜空浅色版） -->
+    <img class="dream-ruyi dream-ruyi-tl" src="images/cloud-ruyi-light.png" alt="" />
+    <img class="dream-ruyi dream-ruyi-br" src="images/cloud-ruyi-light.png" alt="" />
+
+    <!-- 烘云托月：夜色烘底 + 光晕 + 云缕掠月 -->
+    <div class="moon-wrap">
+      <div class="moon-wash"></div>
+      <div class="moon-halo"></div>
+      <div class="moon-disc"></div>
+      <img class="moon-wisp" src="images/cloud-left-a.png" alt="" />
+    </div>
     
     <!-- 跋文：显示在插图原人物空白处 -->
     <div class="dream-text-panel" id="dream-text-panel">
@@ -92,6 +90,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=82"></script>
+  <script src="script.js?v=84"></script>
 </body>
 </html>
